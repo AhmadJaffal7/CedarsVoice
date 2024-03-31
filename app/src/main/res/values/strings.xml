@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">CedarsVoice</string>
+    <string name="submit">Submit</string>
+    <string name="enter_your_national_id">Enter your national id</string>
 </resources>
