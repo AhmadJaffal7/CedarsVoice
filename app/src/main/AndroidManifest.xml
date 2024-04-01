@@ -21,6 +21,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <!-- Declaration for AdminLoginActivity -->
+        <activity android:name=".AdminLoginActivity" />
+
+        <!-- Declaration for SupervisorLoginActivity -->
+        <activity android:name=".SupervisorLoginActivity" />
+
     </application>
 
 </manifest>

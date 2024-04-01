@@ -7,7 +7,7 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/adminId"
+        android:id="@+id/editTextID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Admin ID"
@@ -15,7 +15,7 @@
         android:layout_marginBottom="8dp" />
 
     <EditText
-        android:id="@+id/admin_password_input"
+        android:id="@+id/editTextPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Password"
@@ -28,6 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
+        android:onClick="login"
         android:textSize="18dp"
         android:padding="12dp" />
 
