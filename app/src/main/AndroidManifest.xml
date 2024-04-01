@@ -13,6 +13,12 @@
         android:theme="@style/Theme.CedarsVoice"
         tools:targetApi="31">
         <activity
+            android:name=".VotingAct"
+            android:exported="false" />
+        <activity
+            android:name=".VoterAct"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
@@ -20,14 +26,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        
-        <!-- Declaration for AdminLoginActivity -->
-        <activity android:name=".AdminLoginActivity" />
-
-        <!-- Declaration for SupervisorLoginActivity -->
+        </activity> <!-- Declaration for AdminLoginActivity -->
+        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for SupervisorLoginActivity -->
         <activity android:name=".SupervisorLoginActivity" />
-
     </application>
 
 </manifest>
