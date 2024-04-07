@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Add UI elements for adding candidates, supervisors, and voters -->
+    <Button
+        android:id="@+id/btnAddCandidate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Candidate"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btnAddSupervisor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Supervisor"
+        android:layout_below="@id/btnAddCandidate"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/btnAddVoter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Voter"
+        android:layout_below="@id/btnAddSupervisor"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>

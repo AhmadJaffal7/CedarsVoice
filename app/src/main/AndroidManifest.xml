@@ -28,8 +28,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity> <!-- Declaration for AdminLoginActivity -->
-        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for SupervisorLoginActivity -->
-        <activity android:name=".SupervisorLoginActivity" />
+        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
+        <activity android:name=".SupervisorLoginActivity" /><!-- Declaration for SupervisorLoginActivity -->
+        <activity android:name=".AdminActivity" /><!-- Declaration for AdminActivity -->
+
     </application>
 
 </manifest>
