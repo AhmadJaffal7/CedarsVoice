@@ -88,7 +88,7 @@ public class VoterAct extends AppCompatActivity {
 
     private void checkFingerprintAndDatabase() {
         String nid = editTextId.getText().toString().trim();
-        String url = "http://10.0.2.2/cedarsvoice/cedars.php";
+        String url = "http://127.0.0.1/cedarsvoice/cedars.php"; // Update the server URL
 
         // Send the national ID and scanned fingerprint data to the server
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -126,7 +126,7 @@ public class VoterAct extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("id", nid);
+                params.put("id", nid); // Send voter ID instead of national ID
                 // Convert scanned fingerprint data to base64 string
                 String base64FingerprintData = android.util.Base64.encodeToString(scannedFingerprintData, android.util.Base64.DEFAULT);
                 params.put("fingerprint", base64FingerprintData);
@@ -138,11 +138,7 @@ public class VoterAct extends AppCompatActivity {
     }
 
     private void regularLogin() {
-        String nid = editTextId.getText().toString().trim();
-        String url = "http://10.0.2.2/cedarsvoice/cedars.php?id=" + nid;
-
-        // Your existing code for sending request to server and handling response
-        // ...
+        // Implement regular login here if needed
     }
 
     private void login() {
