@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -36,7 +37,7 @@ public class AdminLoginActivity extends AppCompatActivity {
 
         // Validate user input
         if (!adminName.isEmpty() && !password.isEmpty()) {
-            String url = "http://10.0.2.2/adminLogin.php";
+            String url = "http://10.0.2.2/cedarsvoice/adminLogin.php";
             RequestQueue queue = Volley.newRequestQueue(this);
             StringRequest request = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
@@ -57,6 +58,7 @@ public class AdminLoginActivity extends AppCompatActivity {
                         @Override
                         public void onErrorResponse(VolleyError error) {
                             Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                            Log.e("VolleyError",error.toString());
                         }
                     }) {
                 @Override
