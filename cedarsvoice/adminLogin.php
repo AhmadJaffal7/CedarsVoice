@@ -10,8 +10,10 @@ try {
     $adminPassword = $_POST['admin_password'];
 
     // Prepare SQL statement to select admin with given name and password
-    $stmt = $pdo->prepare("SELECT * FROM Admins WHERE admin_name = $adminName AND admin_password = $adminPassword");
-    $stmt->execute();//Excute the query
+    $stmt = $pdo->prepare("SELECT * FROM Admins WHERE admin_name = :admin_name AND admin_password = :admin_password");
+    $stmt->bindParam(':admin_name', $adminName);
+    $stmt->bindParam(':admin_password', $adminPassword);
+    $stmt->execute();
 
     // Check if admin exists
     if ($stmt->rowCount() > 0) {
@@ -28,3 +30,4 @@ try {
     // Handle database connection error
     die($e->getMessage());
 }
+?>

@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".AddVoterActivity">
+
+    <EditText
+        android:id="@+id/editTextFirstName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="First Name" />
+
+    <EditText
+        android:id="@+id/editTextLastName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Last Name" />
+
+    <EditText
+        android:id="@+id/editTextNationalID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="National ID" />
+
+    <!-- Add Button to Capture Fingerprint -->
+    <Button
+        android:id="@+id/buttonCaptureFingerprint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Capture Fingerprint"
+        android:onClick="captureFingerprint" />
+
+    <!-- Add Button to Add Voter -->
+    <Button
+        android:id="@+id/buttonAddVoter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Voter"
+        android:onClick="addVoter" />
+
+</LinearLayout>
