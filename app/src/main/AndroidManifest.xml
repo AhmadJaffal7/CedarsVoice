@@ -33,6 +33,7 @@
         <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
         <activity android:name=".SupervisorLoginActivity" /><!-- Declaration for SupervisorLoginActivity -->
         <activity android:name=".AdminActivity" /><!-- Declaration for AdminActivity -->
+        <activity android:name=".AddVoterActivity"></activity>
 
     </application>
 

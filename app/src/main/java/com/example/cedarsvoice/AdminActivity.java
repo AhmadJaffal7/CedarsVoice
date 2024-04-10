@@ -40,7 +40,8 @@ public class AdminActivity extends AppCompatActivity {
         btnAddVoter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AdminActivity.this, VoterAct.class));
+                Intent intent = new Intent(AdminActivity.this, AddVoterActivity.class);
+                startActivity(intent);
             }
         });
     }
