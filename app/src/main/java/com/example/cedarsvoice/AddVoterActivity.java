@@ -147,4 +147,20 @@ public class AddVoterActivity extends AppCompatActivity {
 
         queue.add(stringRequest);
     }
+    private SecretKey generateSecretKey() throws Exception {
+        // Get an instance of KeyGenerator with the desired algorithm and provider
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+
+        // Initialize the KeyGenParameterSpec specifying the key alias, purposes, and other parameters
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder("MyKeyAlias", KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setUserAuthenticationRequired(true) // Require user authentication (e.g., fingerprint) for every use of the key
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7);
+
+        // Initialize the KeyGenerator with the KeyGenParameterSpec
+        keyGenerator.init(builder.build());
+
+        // Generate the secret key
+        return keyGenerator.generateKey();
+    }
 }

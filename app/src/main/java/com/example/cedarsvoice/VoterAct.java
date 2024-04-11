@@ -1,22 +1,18 @@
 package com.example.cedarsvoice;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
+import android.security.keystore.KeyGenParameterSpec;
+import android.security.keystore.KeyProperties;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.hardware.biometrics.BiometricPrompt;
-import android.os.CancellationSignal;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 
-import com.android.volley.NetworkError;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,66 +25,113 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 public class VoterAct extends AppCompatActivity {
     EditText editTextId;
     private BiometricPrompt biometricPrompt;
-    private BiometricPrompt.AuthenticationCallback authenticationCallback;
+    private BiometricPrompt.PromptInfo promptInfo;
     private byte[] scannedFingerprintData; // Assuming fingerprint data is scanned
-
+    private Executor executor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voter);
 
         editTextId = findViewById(R.id.Nid);
+        executor = Executors.newSingleThreadExecutor();
 
-        // Initialize BiometricPrompt
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            authenticationCallback = new BiometricPrompt.AuthenticationCallback() {
-                @Override
-                public void onAuthenticationSucceeded(@NonNull BiometricPrompt.AuthenticationResult result) {
-                    super.onAuthenticationSucceeded(result);
-                    // Proceed with fingerprint and database check
-                    checkFingerprintAndDatabase();
-                }
+        Executor executor = ContextCompat.getMainExecutor(this);
 
-                @Override
-                public void onAuthenticationError(int errorCode, @NonNull CharSequence errString) {
-                    super.onAuthenticationError(errorCode, errString);
-                    // Handle authentication errors
-                    Toast.makeText(VoterAct.this, "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
-                }
-            };
-        }
+        biometricPrompt = new BiometricPrompt(VoterAct.this,
+                executor, new BiometricPrompt.AuthenticationCallback() {
+            @Override
+            public void onAuthenticationError(int errorCode, CharSequence errString) {
+                super.onAuthenticationError(errorCode, errString);
+                Toast.makeText(getApplicationContext(), "Authentication error: " + errString, Toast.LENGTH_SHORT).show();
+            }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            biometricPrompt = new BiometricPrompt.Builder(this)
-                    .setTitle("Fingerprint Authentication")
-                    .setSubtitle("Login using your fingerprint")
-                    .setNegativeButton("Cancel", this.getMainExecutor(), (dialogInterface, i) -> {
-                        // User canceled fingerprint authentication
-                    })
-                    .build();
-        }
+            @Override
+            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                super.onAuthenticationSucceeded(result);
+                Toast.makeText(getApplicationContext(), "Authentication succeeded!", Toast.LENGTH_SHORT).show();
+                checkFingerprintAndDatabase();
+            }
+
+            @Override
+            public void onAuthenticationFailed() {
+                super.onAuthenticationFailed();
+                Toast.makeText(getApplicationContext(), "Authentication failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login for my app")
+                .setSubtitle("Log in using your biometric credential")
+                .setNegativeButtonText("Use account password")
+                .build();
     }
 
     public void VoterLogin(View view) {
-        // Check if fingerprint hardware is available and permission is granted
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.USE_BIOMETRIC) == PackageManager.PERMISSION_GRANTED) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                biometricPrompt.authenticate(new CancellationSignal(), this.getMainExecutor(), authenticationCallback);
-            }
-        } else {
-            // Fingerprint authentication not available or permission not granted, proceed with regular login
-            regularLogin();
+        biometricPrompt.authenticate(promptInfo);
+    }
+    public void AuthenticateFingerprint(View view) {
+        try {
+            SecretKey secretKey = generateSecretKey();
+            // Create a Cipher object for encryption
+            Cipher cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7);
+
+            // Initialize the Cipher for encryption
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            // Build the BiometricPrompt.PromptInfo object
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                    .setTitle("Scan your fingerprint")
+                    .setNegativeButtonText("Cancel")
+                    .setConfirmationRequired(false)
+                    .build();
+
+            // Create a BiometricPrompt object
+            BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+                    try {
+                        // Fingerprint authentication succeeded, handle success
+                        scannedFingerprintData = result.getCryptoObject().getCipher().doFinal();
+                        Toast.makeText(VoterAct.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
+                        // Check if the ID exists in the database and proceed with login
+                        checkFingerprintAndDatabase();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onAuthenticationError(int errorCode, CharSequence errString) {
+                    super.onAuthenticationError(errorCode, errString);
+                    // Fingerprint authentication error, handle accordingly
+                    Toast.makeText(VoterAct.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                    Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
+                }
+            });
+
+            // Start the fingerprint authentication process
+            biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(cipher));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private void checkFingerprintAndDatabase() {
+        // You may need to add validation here to ensure the ID is not empty
         String nid = editTextId.getText().toString().trim();
-        String url = "http://127.0.0.1/cedarsvoice/cedars.php"; // Update the server URL
+        String url = "http://10.0.2.2/cedarsvoice/fingerprint.php"; // Update the server URL
 
         // Send the national ID and scanned fingerprint data to the server
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -114,31 +157,23 @@ public class VoterAct extends AppCompatActivity {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        if (error instanceof NetworkError) {
-                            Toast.makeText(VoterAct.this, "Network error occurred", Toast.LENGTH_SHORT).show();
-                        } else if (error instanceof ParseError) {
-                            Toast.makeText(VoterAct.this, "JSON parsing error occurred", Toast.LENGTH_SHORT).show();
-                        } else {
-                            Toast.makeText(VoterAct.this, "Error occurred", Toast.LENGTH_SHORT).show();
-                        }
+                        Toast.makeText(VoterAct.this, "Error occurred" + error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("id", nid); // Send voter ID instead of national ID
-                // Convert scanned fingerprint data to base64 string
-                String base64FingerprintData = android.util.Base64.encodeToString(scannedFingerprintData, android.util.Base64.DEFAULT);
-                params.put("fingerprint", base64FingerprintData);
+                // Convert scanned fingerprint data to base64 string if it's not null
+                if (scannedFingerprintData != null) {
+                    String base64FingerprintData = android.util.Base64.encodeToString(scannedFingerprintData, android.util.Base64.DEFAULT);
+                    params.put("fingerprint", base64FingerprintData);
+                }
                 return params;
             }
         };
 
         queue.add(request);
-    }
-
-    private void regularLogin() {
-        // Implement regular login here if needed
     }
 
     private void login() {
@@ -148,5 +183,21 @@ public class VoterAct extends AppCompatActivity {
         intent.putExtra("message", "Hello from VoterActivity!");
         startActivity(intent);
         Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
+    }
+    private SecretKey generateSecretKey() throws Exception {
+        // Get an instance of KeyGenerator with the desired algorithm and provider
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+
+        // Initialize the KeyGenParameterSpec specifying the key alias, purposes, and other parameters
+        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder("MyKeyAlias", KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                .setUserAuthenticationRequired(true) // Require user authentication (e.g., fingerprint) for every use of the key
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7);
+
+        // Initialize the KeyGenerator with the KeyGenParameterSpec
+        keyGenerator.init(builder.build());
+
+        // Generate the secret key
+        return keyGenerator.generateKey();
     }
 }
