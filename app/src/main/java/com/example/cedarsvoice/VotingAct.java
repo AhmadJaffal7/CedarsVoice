@@ -164,7 +164,7 @@ public class VotingAct extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             try {
-                URL url = new URL("http://10.0.2.2/cedarsvoice/cedars.php");
+                URL url = new URL("http://10.0.2.2/cedarsvoice/candidates.php");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 InputStream inputStream = urlConnection.getInputStream();
                 reader = new BufferedReader(new InputStreamReader(inputStream));
