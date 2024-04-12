@@ -39,8 +39,6 @@ public class AddVoterActivity extends AppCompatActivity {
 
     private EditText editTextFirstName, editTextLastName, editTextNationalID;
     private byte[] capturedFingerprintData;
-    private Context context;
-    private RequestQueue requestQueue;
     private Executor executor;
 
     @Override
@@ -51,7 +49,7 @@ public class AddVoterActivity extends AppCompatActivity {
         editTextFirstName = findViewById(R.id.editTextFirstName);
         editTextLastName = findViewById(R.id.editTextLastName);
         editTextNationalID = findViewById(R.id.editTextNationalID);
-        context = this;
+//        context = this;
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -108,11 +106,29 @@ public class AddVoterActivity extends AppCompatActivity {
                 public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
                     super.onAuthenticationSucceeded(result);
                     try {
-                        // Fingerprint authentication succeeded, handle success
-                        capturedFingerprintData = result.getCryptoObject().getCipher().doFinal();
-                        Toast.makeText(AddVoterActivity.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
+                        if (result.getCryptoObject() != null && result.getCryptoObject().getCipher() != null) {
+                            capturedFingerprintData = result.getCryptoObject().getCipher().doFinal();
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(AddVoterActivity.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        } else {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(AddVoterActivity.this, "Error capturing fingerprint: CryptoObject or Cipher is null", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     } catch (Exception e) {
-                        Toast.makeText(AddVoterActivity.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(AddVoterActivity.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                         Log.e("FingerprintCapture", "Error: ", e);                    }
                 }
 
@@ -137,6 +153,10 @@ public class AddVoterActivity extends AppCompatActivity {
         String firstName = editTextFirstName.getText().toString();
         String lastName = editTextLastName.getText().toString();
         String nationalID = editTextNationalID.getText().toString();
+        if (capturedFingerprintData == null) {
+            Toast.makeText(getApplicationContext(), "Please capture fingerprint", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
 
         if (firstName.isEmpty() || lastName.isEmpty() || nationalID.isEmpty() || fingerprintData.isEmpty()) {
