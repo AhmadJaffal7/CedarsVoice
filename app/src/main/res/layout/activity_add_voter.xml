@@ -40,4 +40,12 @@
         android:text="Add Voter"
         android:onClick="addVoter" />
 
+    <!-- Add ProgressBar to Show Progress -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
 </LinearLayout>
