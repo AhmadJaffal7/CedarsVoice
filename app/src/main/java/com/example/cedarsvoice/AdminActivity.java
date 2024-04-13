@@ -24,8 +24,8 @@ public class AdminActivity extends AppCompatActivity {
         btnAddCandidate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Implement logic to add a candidate
-                Toast.makeText(AdminActivity.this, "Add Candidate clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(AdminActivity.this, AddCandidateActivity.class);
+                startActivity(intent);
             }
         });
 
