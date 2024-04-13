@@ -1,21 +1,21 @@
 package com.example.cedarsvoice;
 
+import android.content.Context;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.biometric.BiometricPrompt;
-import androidx.biometric.BiometricManager;
-
-
-import android.util.Base64;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricManager;
+import androidx.biometric.BiometricPrompt;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,27 +29,24 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import android.content.Context;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-public class AddVoterActivity extends AppCompatActivity {
+public class AddPoliceActivity extends AppCompatActivity {
 
-    private EditText editTextFirstName, editTextLastName, editTextNationalID;
+    private EditText editTextID, editTextName;
     private byte[] capturedFingerprintData;
     private Executor executor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_voter);
+        setContentView(R.layout.activity_add_police);
 
-        editTextFirstName = findViewById(R.id.editTextFirstName);
-        editTextLastName = findViewById(R.id.editTextLastName);
-        editTextNationalID = findViewById(R.id.editTextNationalID);
-//        context = this;
+        editTextID = findViewById(R.id.editTextPoliceID);
+        editTextName = findViewById(R.id.editTextPoliceName);
+
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -59,18 +56,18 @@ public class AddVoterActivity extends AppCompatActivity {
                 BiometricManager biometricManager = BiometricManager.from(this);
                 switch (biometricManager.canAuthenticate()) {
                     case BiometricManager.BIOMETRIC_SUCCESS:
-                        Log.d("MY_APP_TAG", "App can authenticate using biometrics.");
+                        Log.d(getString(R.string.app_name), "App can authenticate using biometrics.");
                         break;
                     case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
-                        Log.e("MY_APP_TAG", "No biometric features available on this device.");
+                        Log.e(getString(R.string.app_name), "No biometric features available on this device.");
                         Toast.makeText(this, "No biometric features available on this device.", Toast.LENGTH_SHORT).show();
                         return;
                     case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
-                        Log.e("MY_APP_TAG", "Biometric features are currently unavailable.");
+                        Log.e(getString(R.string.app_name), "Biometric features are currently unavailable.");
                         Toast.makeText(this, "Biometric features are currently unavailable.", Toast.LENGTH_SHORT).show();
                         return;
                     case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
-                        Log.e("MY_APP_TAG", "The user hasn't associated any biometric credentials with their account.");
+                        Log.e(getString(R.string.app_name), "The user hasn't associated any biometric credentials with their account.");
                         Toast.makeText(this, "The user hasn't associated any biometric credentials with their account.", Toast.LENGTH_SHORT).show();
                         return;
                 }
@@ -111,14 +108,14 @@ public class AddVoterActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(AddVoterActivity.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AddPoliceActivity.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(AddVoterActivity.this, "Error capturing fingerprint: CryptoObject or Cipher is null", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(AddPoliceActivity.this, "Error capturing fingerprint: CryptoObject or Cipher is null", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -126,7 +123,7 @@ public class AddVoterActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(AddVoterActivity.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddPoliceActivity.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                         Log.e("FingerprintCapture", "Error: ", e);                    }
@@ -139,9 +136,10 @@ public class AddVoterActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(AddVoterActivity.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddPoliceActivity.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
                         }
-                    });                    Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
+                    });
+                    Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
                 }
             });
 
@@ -153,22 +151,22 @@ public class AddVoterActivity extends AppCompatActivity {
         }
     }
 
-    public void addVoter(View view) {
-        String firstName = editTextFirstName.getText().toString();
-        String lastName = editTextLastName.getText().toString();
-        String nationalID = editTextNationalID.getText().toString();
+    public void addPolice(View view) {
+        String name = editTextName.getText().toString();
+        String id = editTextID.getText().toString();
         if (capturedFingerprintData == null) {
             Toast.makeText(getApplicationContext(), "Please capture fingerprint", Toast.LENGTH_SHORT).show();
             return;
         }
+
         String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
 
-        if (firstName.isEmpty() || lastName.isEmpty() || nationalID.isEmpty() || fingerprintData.isEmpty()) {
+        if (name.isEmpty() || id.isEmpty() || fingerprintData.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String url = "http://10.0.2.2/cedarsvoice/add_voter.php";
+        String url = "http://10.0.2.2/cedarsvoice/add_police.php";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         // Show the ProgressBar
@@ -183,15 +181,14 @@ public class AddVoterActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         if (response.trim().equals("success")) {
                             // Login successful
-                            Toast.makeText(getApplicationContext(), "Voter added successfully", Toast.LENGTH_SHORT).show();
-                            editTextFirstName.setText("");
-                            editTextLastName.setText("");
-                            editTextNationalID.setText("");
+                            Toast.makeText(getApplicationContext(), "police added successfully", Toast.LENGTH_SHORT).show();
+                            editTextName.setText("");
+                            editTextID.setText("");
                             capturedFingerprintData = null; // Clear the captured fingerprint data
                         } else {
                             // Login failed
-                            Log.e("AddVoter", response.trim());
-                            Toast.makeText(getApplicationContext(), "Failed to add voter, try again later", Toast.LENGTH_SHORT).show();
+                            Log.e("AddSupervisor", response.trim());
+                            Toast.makeText(getApplicationContext(), "Failed to add police, try again later", Toast.LENGTH_SHORT).show();
                         }
                     }
                 },
@@ -207,9 +204,8 @@ public class AddVoterActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                params.put("national_id", nationalID);
-                params.put("first_name", firstName);
-                params.put("last_name", lastName);
+                params.put("police_id", id);
+                params.put("police_name", name);
                 params.put("fingerprint_data", fingerprintData);
                 return params;
             }

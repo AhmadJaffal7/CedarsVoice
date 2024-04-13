@@ -29,5 +29,13 @@
         android:layout_below="@id/btnAddSupervisor"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"/>
+    <Button
+        android:id="@+id/btnAddPolice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add Police"
+        android:layout_below="@id/btnAddVoter"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".AddVoterActivity">
+
+    <EditText
+        android:id="@+id/editTextSupervisorID"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Supervisor ID"
+        android:inputType="number"/>
+
+    <EditText
+        android:id="@+id/editTextSupervisorName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name" />
+
+    <!-- Add Button to Capture Fingerprint -->
+    <Button
+        android:id="@+id/buttonCaptureFingerprint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Capture Fingerprint"
+        android:onClick="captureFingerprint" />
+
+    <!-- Add Button to Add Voter -->
+    <Button
+        android:id="@+id/buttonAddSupervisor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add Supervisor"
+        android:onClick="addSupervisor" />
+
+    <!-- Add ProgressBar to Show Progress -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"/>
+
+</LinearLayout>

@@ -19,6 +19,7 @@ public class AdminActivity extends AppCompatActivity {
         Button btnAddCandidate = findViewById(R.id.btnAddCandidate);
         Button btnAddSupervisor = findViewById(R.id.btnAddSupervisor);
         Button btnAddVoter = findViewById(R.id.btnAddVoter);
+        Button btnAddPolice = findViewById(R.id.btnAddPolice);
 
         // Set onClickListeners
         btnAddCandidate.setOnClickListener(new View.OnClickListener() {
@@ -32,8 +33,8 @@ public class AdminActivity extends AppCompatActivity {
         btnAddSupervisor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Implement logic to add a supervisor
-                Toast.makeText(AdminActivity.this, "Add Supervisor clicked", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(AdminActivity.this, AddSupervisorActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -44,5 +45,14 @@ public class AdminActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        btnAddPolice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AdminActivity.this, AddPoliceActivity.class);
+                startActivity(intent);
+            }
+        });
     }
+
+
 }

@@ -72,6 +72,10 @@ public class AddCandidateActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Toast.makeText(AddCandidateActivity.this, "Candidate added successfully", Toast.LENGTH_SHORT).show();
+                        editTextName.setText("");
+                        editTextLastName.setText("");
+                        editTextAge.setText("");
+                        editTextDescription.setText("");
                     }
                 }, new Response.ErrorListener() {
             @Override
