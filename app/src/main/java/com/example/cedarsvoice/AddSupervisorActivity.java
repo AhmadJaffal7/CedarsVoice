@@ -9,8 +9,10 @@ import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +26,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -36,6 +44,7 @@ import javax.crypto.SecretKey;
 public class AddSupervisorActivity  extends AppCompatActivity {
 
     private EditText editTextID, editTextName;
+    private Spinner spinnerPoliceID;
     private byte[] capturedFingerprintData;
     private Executor executor;
 
@@ -46,8 +55,55 @@ public class AddSupervisorActivity  extends AppCompatActivity {
 
         editTextID = findViewById(R.id.editTextSupervisorID);
         editTextName = findViewById(R.id.editTextSupervisorName);
+        spinnerPoliceID = findViewById(R.id.spinnerPoliceID);
 
         executor = Executors.newSingleThreadExecutor();
+        fetchPoliceIds();
+    }
+
+    private void fetchPoliceIds() {
+        String url = "http://10.0.2.2/cedarsvoice/get_police_ids.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            // Parse the JSON response
+                            JSONArray jsonArray = new JSONArray(response);
+
+                            // Convert the JSONArray to a List
+                            List<String> policeIDs = new ArrayList<>();
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                policeIDs.add(jsonArray.getString(i));
+                            }
+
+                            // Add the default option to the list
+                            policeIDs.add(0, "--Select Police ID--");
+
+                            // If there are no police IDs, add the default option
+                            if (policeIDs.isEmpty()) {
+                                policeIDs.add("Add police and try again");
+                            }
+
+                            // Create an ArrayAdapter and set it to the Spinner
+                            ArrayAdapter<String> adapter = new ArrayAdapter<>(AddSupervisorActivity.this, android.R.layout.simple_spinner_item, policeIDs);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinnerPoliceID.setAdapter(adapter);
+                        } catch (JSONException e) {
+                            Toast.makeText(AddSupervisorActivity.this, "Error parsing JSON: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(AddSupervisorActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        queue.add(stringRequest);
     }
 
     public void captureFingerprint(View view) {
@@ -154,14 +210,28 @@ public class AddSupervisorActivity  extends AppCompatActivity {
     public void addSupervisor(View view) {
         String name = editTextName.getText().toString();
         String id = editTextID.getText().toString();
+        String policeId = spinnerPoliceID.getSelectedItem().toString();
+
         if (capturedFingerprintData == null) {
-            Toast.makeText(getApplicationContext(), "Please capture fingerprint", Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddSupervisorActivity.this, "Please capture fingerprint", Toast.LENGTH_SHORT).show();
             return;
         }
         String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
 
-        if (name.isEmpty() || id.isEmpty() || fingerprintData.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+        if (name.isEmpty() || id.isEmpty() || policeId.isEmpty() || fingerprintData.isEmpty()) {
+            Toast.makeText(AddSupervisorActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if the selected police ID is the default option
+        if (policeId.equals("Add police and try again")) {
+            Toast.makeText(AddSupervisorActivity.this, "Please add police before adding a supervisor", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Check if the selected police ID is the default option
+        if (policeId.equals("--Select Police ID--")) {
+            Toast.makeText(AddSupervisorActivity.this, "Please select a police ID", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -206,6 +276,7 @@ public class AddSupervisorActivity  extends AppCompatActivity {
                 params.put("supervisor_id", id);
                 params.put("supervisor_name", name);
                 params.put("fingerprint_data", fingerprintData);
+                params.put("police_id", policeId);
                 return params;
             }
         };
