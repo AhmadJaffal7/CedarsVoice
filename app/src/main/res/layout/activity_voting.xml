@@ -19,12 +19,15 @@
         android:layout_height="wrap_content"
         android:id="@+id/candidates"
         />
+
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="VoterVote"
         android:text="VOTE"
         android:textSize="30sp"
-        android:onClick="VoterVote"
+        android:layout_marginTop="400dp"
+        android:layout_marginLeft="140dp"
         />
 
 </LinearLayout>

@@ -184,12 +184,13 @@ public void AuthenticateFingerprint(View view) {
 
 
     private void login() {
-        Log.d("Login", "Login method called");
-        Intent intent = new Intent(VoterAct.this, VotingAct.class);
-        intent.putExtra("message", "Hello from VoterActivity!");
-        startActivity(intent);
-        Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
-    }
+    Log.d("Login", "Login method called");
+    Intent intent = new Intent(VoterAct.this, VotingAct.class);
+    intent.putExtra("message", "Hello from VoterActivity!");
+    intent.putExtra("voter_id", "logged_in_voter_id"); // replace with actual logged in voter id
+    startActivity(intent);
+    Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
+}
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
