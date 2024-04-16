@@ -1,5 +1,6 @@
 package com.example.cedarsvoice;
 
+import android.content.DialogInterface;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import androidx.biometric.BiometricManager;
 import android.util.Base64;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import android.app.AlertDialog;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,6 +43,9 @@ public class AddVoterActivity extends AppCompatActivity {
     private byte[] capturedFingerprintData;
     private Executor executor;
 
+    private FingerprintUploader fingerprintUploader;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,7 +54,9 @@ public class AddVoterActivity extends AppCompatActivity {
         editTextFirstName = findViewById(R.id.editTextFirstName);
         editTextLastName = findViewById(R.id.editTextLastName);
         editTextNationalID = findViewById(R.id.editTextNationalID);
-//        context = this;
+
+        fingerprintUploader = new FingerprintUploader();
+
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -232,5 +239,23 @@ public class AddVoterActivity extends AppCompatActivity {
 
         // Generate the secret key
         return keyGenerator.generateKey();
+    }
+
+    public void addFingerprint(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Fingerprint")
+                .setItems(new CharSequence[]{"Capture Fingerprint", "Upload Fingerprint File"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+//                            fingerprintAuthenticationManager.authenticate();
+                            captureFingerprint(view);
+                        } else {
+                            fingerprintUploader.uploadFingerprintFile(AddVoterActivity.this);
+                        }
+                    }
+                });
+        builder.create().show();
+
     }
 }

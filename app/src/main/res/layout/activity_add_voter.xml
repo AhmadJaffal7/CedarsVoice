@@ -24,13 +24,13 @@
         android:layout_height="wrap_content"
         android:hint="National ID" />
 
-    <!-- Add Button to Capture Fingerprint -->
+    <!-- Add Button to Add Fingerprint -->
     <Button
-        android:id="@+id/buttonCaptureFingerprint"
+        android:id="@+id/btnAddFingerprint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Capture Fingerprint"
-        android:onClick="captureFingerprint" />
+        android:text="Add Fingerprint"
+        android:onClick="addFingerprint"/>
 
     <!-- Add Button to Add Voter -->
     <Button
