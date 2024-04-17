@@ -101,6 +101,7 @@ public void VoterLogin(View view) {
             new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
+                    Log.d("Response", response);
                     try {
                         JSONObject jsonResponse = new JSONObject(response);
                         Log.d("Response", jsonResponse.toString());
