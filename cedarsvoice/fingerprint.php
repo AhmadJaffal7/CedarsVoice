@@ -1,29 +1,28 @@
 <?php
-define('DBHOST', 'localhost');
-define('DBNAME', 'cedars_voice');
-define('DBUSER', 'root');
-define('DBPASS', '');
-define('DBCONNSTRING', 'mysql:host='.DBHOST.';dbname='.DBNAME);
+
 
 require_once('config.php');
 
 // Function to compare fingerprint data
-function compareFingerprint($scannedFingerprintData, $storedFingerprintData) {
-    // Implement your comparison logic here
-    // For demonstration purposes, a simple byte-to-byte comparison is used
+function compareFingerprint($scannedFingerprintData, $storedFingerprintData)
+{
+    // Compare the scanned fingerprint data with the stored fingerprint data
+    // Since the fingerprint data is stored as a BLOB, we can do a direct byte-by-byte comparison
     return ($scannedFingerprintData === $storedFingerprintData);
 }
 
 // Function to retrieve fingerprint data from the database
-function retrieveFingerprintData($voterId) {
+function retrieveFingerprintData($voterId)
+{
     try {
         $pdo = new PDO(DBCONNSTRING, DBUSER, DBPASS);
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         // Prepare and execute the SQL query to retrieve fingerprint data
-        $sql = "SELECT voter_fingerprint FROM voters WHERE voter_id = ?";
+        $sql = "SELECT voter_fingerprint FROM voters WHERE voter_id = :voter_id";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$voterId]);
+        $stmt->bindParam(':voter_id', $voterId, PDO::PARAM_INT);
+        $stmt->execute();
 
         // Check if the query returned a result
         if ($stmt->rowCount() > 0) {
@@ -36,17 +35,15 @@ function retrieveFingerprintData($voterId) {
         }
     } catch (PDOException $e) {
         // Database error
-        $error = new stdClass();
-        $error->message = "Database error: " . $e->getMessage();
-        echo json_encode($error);
-        exit();
+        error_log("Database error: " . $e->getMessage());
+        return null;
     }
 }
 
 // Main code
 try {
     // Get the voter ID from the request
-    $voterId = $_POST['id'];
+    $voterId = filter_var($_POST['id'], FILTER_VALIDATE_INT);
 
     // Retrieve the scanned fingerprint data from the request (assuming it's passed as a base64 encoded string)
     $scannedFingerprintData = base64_decode($_POST['fingerprint']);
@@ -71,8 +68,8 @@ try {
     }
 } catch (Exception $e) {
     // Error occurred
+    error_log("Error: " . $e->getMessage());
     $error = new stdClass();
-    $error->message = "Error: " . $e->getMessage();
+    $error->message = "An error occurred while processing the request";
     echo json_encode($error);
 }
-?>
