@@ -1,9 +1,17 @@
 package com.example.cedarsvoice;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.hardware.fingerprint.FingerprintManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
@@ -24,6 +32,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -38,6 +49,8 @@ public class AddPoliceActivity extends AppCompatActivity {
     private EditText editTextID, editTextName;
     private byte[] capturedFingerprintData;
     private Executor executor;
+    private Uri fileUri;
+    private static final int FILE_PICK_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +63,23 @@ public class AddPoliceActivity extends AppCompatActivity {
         executor = Executors.newSingleThreadExecutor();
     }
 
-    public void captureFingerprint(View view) {
+    public void addFingerprint(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Fingerprint")
+                .setItems(new CharSequence[]{"Capture Fingerprint", "Upload Fingerprint File"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            captureFingerprint();
+                        } else {
+                            uploadFingerprint();
+                        }
+                    }
+                });
+        builder.create().show();
+    }
+
+    public void captureFingerprint() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 BiometricManager biometricManager = BiometricManager.from(this);
@@ -228,5 +257,56 @@ public class AddPoliceActivity extends AppCompatActivity {
 
         // Generate the secret key
         return keyGenerator.generateKey();
+    }
+    private void uploadFingerprint() {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("*/*");
+        startActivityForResult(intent, FILE_PICK_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == FILE_PICK_REQUEST_CODE && resultCode ==  Activity.RESULT_OK) {
+            fileUri = data.getData();
+            String fileName = getFileName(fileUri, getContentResolver());
+            Log.d("AddPoliceActivity", "Selected file: " + fileName);
+            capturedFingerprintData = readFileBytes(fileUri, getContentResolver());
+            Toast.makeText(AddPoliceActivity.this, "Fingerprint file uploaded successfully", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getFileName(Uri uri, ContentResolver contentResolver) {
+        Cursor cursor = contentResolver.query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+        String fileName = cursor.getString(nameIndex);
+        cursor.close();
+        return fileName;
+    }
+
+    private byte[] readFileBytes(Uri uri, ContentResolver contentResolver) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        InputStream inputStream = null;
+        try {
+            inputStream = contentResolver.openInputStream(uri);
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            Log.e("AddPoliceActivity", "Error reading file: " + e.getMessage());
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    Log.e("AddPoliceActivity", "Error closing input stream: " + e.getMessage());
+                }
+            }
+        }
+        return outputStream.toByteArray();
     }
 }

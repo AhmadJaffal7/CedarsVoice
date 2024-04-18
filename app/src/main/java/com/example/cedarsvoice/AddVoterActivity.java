@@ -84,7 +84,6 @@ public class AddVoterActivity extends AppCompatActivity {
                     }
                 });
         builder.create().show();
-
     }
 
     public void addVoter(View view) {

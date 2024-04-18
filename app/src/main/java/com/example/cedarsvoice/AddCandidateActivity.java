@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,6 +67,9 @@ public class AddCandidateActivity extends AppCompatActivity {
         }
 
         String url = "http://10.0.2.2/cedarsvoice/add_candidate.php";
+        // Show the ProgressBar
+        ProgressBar progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
 
         StringRequest request = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
@@ -76,6 +80,7 @@ public class AddCandidateActivity extends AppCompatActivity {
                         editTextLastName.setText("");
                         editTextAge.setText("");
                         editTextDescription.setText("");
+                        progressBar.setVisibility(View.GONE);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -92,6 +97,7 @@ public class AddCandidateActivity extends AppCompatActivity {
                 }
                 Toast.makeText(AddCandidateActivity.this, message, Toast.LENGTH_SHORT).show();
                 Log.e("AddCandidateActivity", "Error: " + message, error);
+                progressBar.setVisibility(View.GONE);
             }
         }) {
             @Override

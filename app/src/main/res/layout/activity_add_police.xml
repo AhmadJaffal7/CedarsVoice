@@ -19,28 +19,34 @@
         android:layout_height="wrap_content"
         android:hint="Name" />
 
-    <!-- Add Button to Capture Fingerprint -->
+    <!-- Add Button to Add Fingerprint -->
     <Button
-        android:id="@+id/buttonCaptureFingerprint"
+        android:id="@+id/btnAddFingerprint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Capture Fingerprint"
-        android:onClick="captureFingerprint" />
+        android:text="Add Fingerprint"
+        android:onClick="addFingerprint"/>
 
     <!-- Add Button to Add Voter -->
     <Button
-        android:id="@+id/buttonAddSPolice"
+        android:id="@+id/buttonAddPolice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Police"
         android:onClick="addPolice" />
 
     <!-- Add ProgressBar to Show Progress -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:visibility="gone"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"/>
+    </LinearLayout>
 
 </LinearLayout>
