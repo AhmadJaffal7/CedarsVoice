@@ -24,6 +24,8 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AddCandidateActivity extends AppCompatActivity {
 
@@ -66,51 +68,63 @@ public class AddCandidateActivity extends AppCompatActivity {
             return;
         }
 
+        // Validate name and lastName to prevent SQL injection
+        if (!name.matches("[a-zA-Z ]+") || !lastName.matches("[a-zA-Z ]+")) {
+            Toast.makeText(getApplicationContext(), "Invalid input. Only alphabetic characters and spaces are allowed for name and last name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String url = "http://10.0.2.2/cedarsvoice/add_candidate.php";
         // Show the ProgressBar
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        StringRequest request = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                StringRequest request = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Toast.makeText(AddCandidateActivity.this, "Candidate added successfully", Toast.LENGTH_SHORT).show();
+                                editTextName.setText("");
+                                editTextLastName.setText("");
+                                editTextAge.setText("");
+                                editTextDescription.setText("");
+                                progressBar.setVisibility(View.GONE);
+                            }
+                        }, new Response.ErrorListener() {
                     @Override
-                    public void onResponse(String response) {
-                        Toast.makeText(AddCandidateActivity.this, "Candidate added successfully", Toast.LENGTH_SHORT).show();
-                        editTextName.setText("");
-                        editTextLastName.setText("");
-                        editTextAge.setText("");
-                        editTextDescription.setText("");
+                    public void onErrorResponse(VolleyError error) {
+                        String message = null;
+                        if (error instanceof NetworkError || error instanceof NoConnectionError || error instanceof AuthFailureError) {
+                            message = getString(R.string.cannot_connect);
+                        } else if (error instanceof ServerError) {
+                            message = getString(R.string.server_not_found);
+                        } else if (error instanceof ParseError) {
+                            message = getString(R.string.parsing_error);
+                        } else if (error instanceof TimeoutError) {
+                            message = getString(R.string.connection_timeout);
+                        }
+                        Toast.makeText(AddCandidateActivity.this, message, Toast.LENGTH_SHORT).show();
+                        Log.e("AddCandidateActivity", "Error: " + message, error);
                         progressBar.setVisibility(View.GONE);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                String message = null;
-                if (error instanceof NetworkError || error instanceof NoConnectionError || error instanceof AuthFailureError) {
-                    message = getString(R.string.cannot_connect);
-                } else if (error instanceof ServerError) {
-                    message = getString(R.string.server_not_found);
-                }else if (error instanceof ParseError) {
-                    message = getString(R.string.parsing_error);
-                }else if (error instanceof TimeoutError) {
-                    message = getString(R.string.connection_timeout);
-                }
-                Toast.makeText(AddCandidateActivity.this, message, Toast.LENGTH_SHORT).show();
-                Log.e("AddCandidateActivity", "Error: " + message, error);
-                progressBar.setVisibility(View.GONE);
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("first_name", name);
-                params.put("last_name", lastName);
-                params.put("age", ageString);
-                params.put("description", description);
-                return params;
-            }
-        };
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("first_name", name);
+                        params.put("last_name", lastName);
+                        params.put("age", ageString);
+                        params.put("description", description);
+                        return params;
+                    }
+                };
 
-        requestQueue.add(request);
+                requestQueue.add(request);
+            }
+        });
     }
 }

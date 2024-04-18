@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
@@ -182,7 +183,30 @@ public class AddPoliceActivity extends AppCompatActivity {
 
     public void addPolice(View view) {
         String name = editTextName.getText().toString();
-        String id = editTextID.getText().toString();
+        String id = editTextID.getText().toString().trim();
+
+        // Validate user input
+        if (name.isEmpty() || id.isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!name.matches("[a-zA-Z]+")) {
+            Toast.makeText(getApplicationContext(), "Invalid input. Only letters are allowed for name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate user input
+        if (!id.matches("\\d+")) { // "\\d+" matches one or more digit characters
+            Toast.makeText(getApplicationContext(), "Invalid input. Only numbers are allowed for id", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (id.length() > 11) {
+            Toast.makeText(getApplicationContext(), "Invalid input. ID should not be more than 11 digits", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (capturedFingerprintData == null) {
             Toast.makeText(getApplicationContext(), "Please capture fingerprint", Toast.LENGTH_SHORT).show();
             return;
@@ -190,57 +214,61 @@ public class AddPoliceActivity extends AppCompatActivity {
 
         String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
 
-        if (name.isEmpty() || id.isEmpty() || fingerprintData.isEmpty()) {
-            Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         String url = "http://10.0.2.2/cedarsvoice/add_police.php";
-        RequestQueue queue = Volley.newRequestQueue(this);
 
         // Show the ProgressBar
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Hide the ProgressBar
-                        progressBar.setVisibility(View.GONE);
-                        if (response.trim().equals("success")) {
-                            // Login successful
-                            Toast.makeText(getApplicationContext(), "police added successfully", Toast.LENGTH_SHORT).show();
-                            editTextName.setText("");
-                            editTextID.setText("");
-                            capturedFingerprintData = null; // Clear the captured fingerprint data
-                        } else {
-                            // Login failed
-                            Log.e("AddSupervisor", response.trim());
-                            Toast.makeText(getApplicationContext(), "Failed to add police, try again later", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Hide the ProgressBar
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
-                        Log.e("VolleyError",error.toString());
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("police_id", id);
-                params.put("police_name", name);
-                params.put("fingerprint_data", fingerprintData);
-                return params;
-            }
-        };
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-        queue.add(stringRequest);
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
+                RequestQueue queue = Volley.newRequestQueue(AddPoliceActivity.this);
+
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // Hide the ProgressBar
+                                progressBar.setVisibility(View.GONE);
+                                if (response.trim().equals("success")) {
+                                    // Login successful
+                                    Toast.makeText(getApplicationContext(), "police added successfully", Toast.LENGTH_SHORT).show();
+                                    editTextName.setText("");
+                                    editTextID.setText("");
+                                    capturedFingerprintData = null; // Clear the captured fingerprint data
+                                } else {
+                                    // Login failed
+                                    Log.e("AddSupervisor", response.trim());
+                                    Toast.makeText(getApplicationContext(), "Failed to add police, try again later", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // Hide the ProgressBar
+                                progressBar.setVisibility(View.GONE);
+                                // Handle the error
+                                Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                                Log.e("VolleyError",error.toString());
+                            }
+                        }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("police_id", id);
+                        params.put("police_name", name);
+                        params.put("fingerprint_data", fingerprintData);
+                        return params;
+                    }
+                };
+
+                queue.add(stringRequest);
+            }
+        });
     }
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider
@@ -268,12 +296,17 @@ public class AddPoliceActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == FILE_PICK_REQUEST_CODE && resultCode ==  Activity.RESULT_OK) {
-            fileUri = data.getData();
-            String fileName = getFileName(fileUri, getContentResolver());
-            Log.d("AddPoliceActivity", "Selected file: " + fileName);
-            capturedFingerprintData = readFileBytes(fileUri, getContentResolver());
-            Toast.makeText(AddPoliceActivity.this, "Fingerprint file uploaded successfully", Toast.LENGTH_SHORT).show();
+        if (requestCode == FILE_PICK_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                fileUri = data.getData();
+                String fileName = getFileName(fileUri, getContentResolver());
+                Log.d("AddPoliceActivity", "Selected file: " + fileName);
+                capturedFingerprintData = readFileBytes(fileUri, getContentResolver());
+                Toast.makeText(AddPoliceActivity.this, "Fingerprint file uploaded successfully", Toast.LENGTH_SHORT).show();
+            } else if (resultCode == Activity.RESULT_CANCELED) {
+                // The user cancelled the file picker
+                Toast.makeText(AddPoliceActivity.this, "File selection was cancelled", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -295,6 +328,8 @@ public class AddPoliceActivity extends AppCompatActivity {
             int bytesRead;
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
+                // Clear the buffer to free up memory
+                buffer = new byte[4096];
             }
         } catch (IOException e) {
             Log.e("AddPoliceActivity", "Error reading file: " + e.getMessage());

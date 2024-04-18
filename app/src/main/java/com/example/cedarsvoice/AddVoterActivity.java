@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import android.content.Context;
@@ -96,8 +97,26 @@ public class AddVoterActivity extends AppCompatActivity {
         }
         String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
 
+        // Validate user input
         if (firstName.isEmpty() || lastName.isEmpty() || nationalID.isEmpty() || fingerprintData.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Please fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate firstName and lastName to prevent SQL injection
+        if (!firstName.matches("[a-zA-Z ]+") || !lastName.matches("[a-zA-Z ]+")) {
+            Toast.makeText(getApplicationContext(), "Invalid input. Only alphabetic characters and spaces are allowed for first name and last name", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate nationalID to prevent SQL injection
+        if (!nationalID.matches("\\d+")) { // "\\d+" matches one or more digit characters
+            Toast.makeText(getApplicationContext(), "Invalid input. Only numbers are allowed for national ID", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (nationalID.length() > 11) {
+            Toast.makeText(getApplicationContext(), "Invalid input. National ID should not be more than 11 digits", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -108,6 +127,10 @@ public class AddVoterActivity extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
+            @Override
+            public void run() {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -149,6 +172,8 @@ public class AddVoterActivity extends AppCompatActivity {
         };
 
         queue.add(stringRequest);
+            }
+        });
     }
 
 

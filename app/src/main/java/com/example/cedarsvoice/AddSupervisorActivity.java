@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.crypto.Cipher;
@@ -253,15 +254,26 @@ public class AddSupervisorActivity  extends AppCompatActivity {
             return;
         }
 
-        // Check if the selected police ID is the default option
-        if (policeId.equals("Add police and try again")) {
-            Toast.makeText(AddSupervisorActivity.this, "Please add police before adding a supervisor", Toast.LENGTH_SHORT).show();
+        // Validate name to prevent SQL injection
+        if (!name.matches("[a-zA-Z ]+")) {
+            Toast.makeText(getApplicationContext(), "Invalid input. Only alphabetic characters and spaces are allowed for name", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Check if the selected police ID is the default option
-        if (policeId.equals("--Select Police ID--")) {
-            Toast.makeText(AddSupervisorActivity.this, "Please select a police ID", Toast.LENGTH_SHORT).show();
+        // Validate id to prevent SQL injection
+        if (!id.matches("\\d+")) { // "\\d+" matches one or more digit characters
+            Toast.makeText(getApplicationContext(), "Invalid input. Only numbers are allowed for id", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (id.length() > 11) {
+            Toast.makeText(getApplicationContext(), "Invalid input. ID should not be more than 11 digits", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate policeId to prevent SQL injection
+        if (!policeId.matches("\\d+")) { // "\\d+" matches one or more digit characters
+            Toast.makeText(getApplicationContext(), "Select an id for police ID", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -272,46 +284,52 @@ public class AddSupervisorActivity  extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Hide the ProgressBar
-                        progressBar.setVisibility(View.GONE);
-                        if (response.trim().equals("success")) {
-                            // Login successful
-                            Toast.makeText(getApplicationContext(), "Supervisor added successfully", Toast.LENGTH_SHORT).show();
-                            editTextName.setText("");
-                            editTextID.setText("");
-                            capturedFingerprintData = null; // Clear the captured fingerprint data
-                        } else {
-                            // Login failed
-                            Log.e("AddSupervisor", response.trim());
-                            Toast.makeText(getApplicationContext(), "Failed to add supervisor, try again later", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Hide the ProgressBar
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
-                        Log.e("VolleyError",error.toString());
-                    }
-                }) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(new Runnable() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("supervisor_id", id);
-                params.put("supervisor_name", name);
-                params.put("fingerprint_data", fingerprintData);
-                params.put("police_id", policeId);
-                return params;
-            }
-        };
+            public void run() {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                // Hide the ProgressBar
+                                progressBar.setVisibility(View.GONE);
+                                if (response.trim().equals("success")) {
+                                    // Login successful
+                                    Toast.makeText(getApplicationContext(), "Supervisor added successfully", Toast.LENGTH_SHORT).show();
+                                    editTextName.setText("");
+                                    editTextID.setText("");
+                                    capturedFingerprintData = null; // Clear the captured fingerprint data
+                                } else {
+                                    // Login failed
+                                    Log.e("AddSupervisor", response.trim());
+                                    Toast.makeText(getApplicationContext(), "Failed to add supervisor, try again later", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                // Hide the ProgressBar
+                                progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                                Log.e("VolleyError", error.toString());
+                            }
+                        }) {
+                    @Override
+                    protected Map<String, String> getParams() {
+                        Map<String, String> params = new HashMap<>();
+                        params.put("supervisor_id", id);
+                        params.put("supervisor_name", name);
+                        params.put("fingerprint_data", fingerprintData);
+                        params.put("police_id", policeId);
+                        return params;
+                    }
+                };
 
-        queue.add(stringRequest);
+                queue.add(stringRequest);
+            }
+        });
     }
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider

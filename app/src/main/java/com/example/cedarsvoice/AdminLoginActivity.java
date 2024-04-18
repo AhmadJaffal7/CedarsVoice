@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -21,6 +22,7 @@ import java.util.Map;
 
 public class AdminLoginActivity extends AppCompatActivity {
     private EditText userIdInput, passwordInput;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,7 @@ public class AdminLoginActivity extends AppCompatActivity {
 
         userIdInput = findViewById(R.id.editTextID);
         passwordInput = findViewById(R.id.editTextPassword);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void login(View view) {
@@ -39,10 +42,17 @@ public class AdminLoginActivity extends AppCompatActivity {
         if (!adminName.isEmpty() && !password.isEmpty()) {
             String url = "http://10.0.2.2/cedarsvoice/admin_login.php";
             RequestQueue queue = Volley.newRequestQueue(this);
+
+            // Show the ProgressBar
+            progressBar.setVisibility(View.VISIBLE);
+
             StringRequest request = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
+                            // Hide the ProgressBar
+                            progressBar.setVisibility(View.GONE);
+
                             if (response.trim().equals("success")) {
                                 // Login successful
                                 Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_SHORT).show();
@@ -57,6 +67,9 @@ public class AdminLoginActivity extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
+                            // Hide the ProgressBar
+                            progressBar.setVisibility(View.GONE);
+
                             Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
                             Log.e("VolleyError",error.toString());
                         }
