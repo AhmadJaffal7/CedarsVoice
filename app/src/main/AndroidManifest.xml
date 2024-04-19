@@ -29,7 +29,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Declaration for AdminLoginActivity -->
+        </activity>
         <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
         <activity android:name=".SupervisorLoginActivity" /><!-- Declaration for SupervisorLoginActivity -->
         <activity android:name=".AdminActivity" /><!-- Declaration for AdminActivity -->
@@ -37,7 +37,7 @@
         <activity android:name=".AddCandidateActivity" /><!-- Declaration for AddCandidateActivity -->
         <activity android:name=".AddSupervisorActivity" /><!-- Declaration for AddSupervisorActivity -->
         <activity android:name=".AddPoliceActivity" /><!-- Declaration for AddPoliceActivity -->
-
+        <activity android:name=".SupervisorActivity"></activity><!-- Declaration for SupervisorActivity -->
     </application>
 
 </manifest>

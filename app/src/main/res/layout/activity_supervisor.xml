@@ -9,17 +9,57 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Supervisor Page"
+        android:text="@string/supervisor_page"
         android:textSize="24sp"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/startTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Time:"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/startTimeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="none"
+        android:focusable="false"
+        android:visibility="gone"
+        android:onClick="showStartTimePicker"/>
+
+    <TextView
+        android:id="@+id/endTimeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="End Time:"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/endTimeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="none"
+        android:focusable="false"
+        android:visibility="gone"
+        android:onClick="showEndTimePicker"/>
+
+    <Button
+        android:id="@+id/butSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Save"
+        android:onClick="saveTimes"
+        android:visibility="gone"/>
 
     <!-- Button to Start Election -->
     <Button
         android:id="@+id/butStartElection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Election"
+        android:text="@string/start_election"
         android:layout_marginBottom="16dp"
         android:onClick="startElection"/>
 </LinearLayout>

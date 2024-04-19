@@ -24,7 +24,7 @@
         android:id="@+id/btnAddFingerprint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Fingerprint"
+        android:text="@string/add_fingerprint"
         android:onClick="addFingerprint"/>
 
     <!-- Add Button to Add Voter -->
@@ -32,7 +32,7 @@
         android:id="@+id/buttonAddPolice"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Police"
+        android:text="@string/add_police"
         android:onClick="addPolice" />
 
     <!-- Add ProgressBar to Show Progress -->
