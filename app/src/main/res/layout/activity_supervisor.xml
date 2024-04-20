@@ -47,10 +47,10 @@
         android:onClick="showEndTimePicker"/>
 
     <Button
-        android:id="@+id/butSave"
-        android:layout_width="wrap_content"
+        android:id="@+id/butStart"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Save"
+        android:text="Start"
         android:onClick="saveTimes"
         android:visibility="gone"/>
 

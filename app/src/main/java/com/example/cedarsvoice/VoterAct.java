@@ -202,12 +202,20 @@ public void AuthenticateFingerprint(View view) {
 
 
     private void login() {
-    Log.d("Login", "Login method called");
-    Intent intent = new Intent(VoterAct.this, VotingAct.class);
-    intent.putExtra("message", "Hello from VoterActivity!");
-    intent.putExtra("voter_id", "logged_in_voter_id"); // replace with actual logged in voter id
-    startActivity(intent);
-    Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
+        try{
+            Log.d("Login", "Login method called");
+            Intent intent = new Intent(VoterAct.this, VotingAct.class);
+            intent.putExtra("message", "Hello from VoterActivity!");
+            intent.putExtra("voter_id", "logged_in_voter_id"); // replace with actual logged in voter id
+            intent.putExtra("endTime", endTime); // endTime is a String containing the end time
+            startActivity(intent);
+            Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
+        }catch (Exception e) {
+            // Log the exception
+            Log.e("VoterAct", "Error during login", e);
+            // Show an error message to the user
+            Toast.makeText(this, "Error during login. Please try again.", Toast.LENGTH_SHORT).show();
+        }
 }
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider
@@ -227,105 +235,138 @@ public void AuthenticateFingerprint(View view) {
     }
     private void calculateRemainingTime() {
         try {
-            // Parse end time to get hours and minutes
-            String[] endTimeParts = endTime.split(":");
-            int endHour = Integer.parseInt(endTimeParts[0]);
-            int endMinute = Integer.parseInt(endTimeParts[1]);
+            if (endTime != null) {
+                // Parse end time to get hours and minutes
+                String[] endTimeParts = endTime.split(":");
+                int endHour = Integer.parseInt(endTimeParts[0]);
+                int endMinute = Integer.parseInt(endTimeParts[1]);
 
-            // Get current time
-            Calendar currentTime = Calendar.getInstance();
-            int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
-            int currentMinute = currentTime.get(Calendar.MINUTE);
+                // Get current time
+                Calendar currentTime = Calendar.getInstance();
+                int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
+                int currentMinute = currentTime.get(Calendar.MINUTE);
 
-            // Calculate remaining time in minutes
-            int remainingMinutes = (endHour - currentHour) * 60 + (endMinute - currentMinute);
+                // Calculate remaining time in minutes
+                int remainingMinutes = (endHour - currentHour) * 60 + (endMinute - currentMinute);
 
-            // Convert remaining time to hours and minutes
-            int remainingHours = remainingMinutes / 60;
-            int remainingMinutesAfterHours = remainingMinutes % 60;
+                // Check if end time is the next day
+                if (remainingMinutes < 0) {
+                    remainingMinutes += 24 * 60; // Add 24 hours
+                }
 
-            // Display remaining time in TextView
-            String remainingTimeString = String.format(Locale.getDefault(), "%d hours %d minutes", remainingHours, remainingMinutesAfterHours);
-            remainingTimeTextView.setText(remainingTimeString);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
-            remainingTimeTextView.setText("Error calculating remaining time");
+                // Convert remaining time to hours and minutes
+                int remainingHours = remainingMinutes / 60;
+                int remainingMinutesAfterHours = remainingMinutes % 60;
+
+                // Display remaining time in TextView
+                String remainingTimeString = String.format(Locale.getDefault(), "%d hours %d minutes", remainingHours, remainingMinutesAfterHours);
+                remainingTimeTextView.setText(remainingTimeString);
+            } else {
+                Log.e("VoterAct", "End time is null");
+                remainingTimeTextView.setText("End time is not set");
+            }
+        } catch (NumberFormatException e) {
+            Log.e("VoterAct", "Error parsing end time", e);
+            remainingTimeTextView.setText("Error parsing end time");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            Log.e("VoterAct", "Error splitting end time", e);
+            remainingTimeTextView.setText("Error splitting end time");
         }
     }
     private void startCountdownTimer() {
-        if (endTime != null && !endTime.isEmpty()) {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            try {
-                Date endTimeDate = sdf.parse(endTime);
-                // Set the date of endTimeDate to the current date
-                Calendar endTimeCalendar = Calendar.getInstance();
-                endTimeCalendar.setTime(endTimeDate);
-                endTimeCalendar.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-                endTimeCalendar.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
-                endTimeCalendar.set(Calendar.DAY_OF_MONTH, Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+        if (endTime == null || endTime.isEmpty()) {
+            Log.e("VoterAct", "End time is null or empty");
+            remainingTimeTextView.setText("End time is not set");
+            return;
+        }
 
-                long endTimeMillis = endTimeCalendar.getTimeInMillis();
-                long currentTimeMillis = System.currentTimeMillis();
-                long remainingTimeMillis = endTimeMillis - currentTimeMillis;
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        try {
+            Date endTimeDate = sdf.parse(endTime);
+            // Set the date of endTimeDate to the current date
+            Calendar endTimeCalendar = Calendar.getInstance();
+            endTimeCalendar.setTime(endTimeDate);
+            endTimeCalendar.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
+            endTimeCalendar.set(Calendar.MONTH, Calendar.getInstance().get(Calendar.MONTH));
+            endTimeCalendar.set(Calendar.DAY_OF_MONTH, Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
 
-                if (remainingTimeMillis > 0) {
-                    countDownTimer = new CountDownTimer(remainingTimeMillis, 1000) {
-                        @Override
-                        public void onTick(long millisUntilFinished) {
-                            // Update remaining time on each tick
-                            updateRemainingTime(millisUntilFinished);
-                        }
+            long endTimeMillis = endTimeCalendar.getTimeInMillis();
+            long currentTimeMillis = System.currentTimeMillis();
+            long remainingTimeMillis = endTimeMillis - currentTimeMillis;
 
-                        @Override
-                        public void onFinish() {
-                            // Close VoterActivity and open SupervisorActivity
-                            Intent intent = new Intent(VoterAct.this, SupervisorActivity.class);
-                            startActivity(intent);
-                            finish(); // Close current activity
-                        }
-                    }.start();
-                }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            } catch (java.text.ParseException e) {
-                throw new RuntimeException(e);
+            if (remainingTimeMillis <= 0) {
+                Log.e("VoterAct", "End time has already passed");
+                remainingTimeTextView.setText("End time has already passed");
+                return;
             }
+
+            countDownTimer = new CountDownTimer(remainingTimeMillis, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    // Update remaining time on each tick
+                    updateRemainingTime(millisUntilFinished);
+                }
+
+                @Override
+                public void onFinish() {
+                    // Close VoterActivity and open SupervisorActivity
+                    Intent intent = new Intent(VoterAct.this, SupervisorActivity.class);
+                    startActivity(intent);
+                    finish(); // Close current activity
+                }
+            }.start();
+        } catch (ParseException e) {
+            Log.e("VoterAct", "Error parsing end time", e);
+            remainingTimeTextView.setText("Error parsing end time");
+        } catch (java.text.ParseException e) {
+            Log.e("VoterAct", "Error parsing end time", e);
+            remainingTimeTextView.setText("Error parsing end time");
         }
     }
-
     private void updateRemainingTime(long millisUntilFinished) {
-        // Convert milliseconds until finished to hours, minutes and seconds
-        long totalSeconds = millisUntilFinished / 1000;
-        long hours = totalSeconds / 3600;
-        long minutes = (totalSeconds % 3600) / 60;
-        long seconds = totalSeconds % 60;
-
-        // Create a StringBuilder to build the remaining time string
-        StringBuilder remainingTimeString = new StringBuilder();
-        remainingTimeString.append("Remaining time: ");
-        // Append hours to the string if not zero
-        if (hours > 0) {
-            remainingTimeString.append(hours).append(" hours ");
+        if (millisUntilFinished <= 0) {
+            Log.e("VoterAct", "Time has already finished");
+            remainingTimeTextView.setText("Time has already finished");
+            return;
         }
 
-        // Append minutes to the string if not zero
-        if (minutes > 0) {
-            remainingTimeString.append(minutes).append(" minutes ");
+        try {
+            // Convert milliseconds until finished to hours, minutes and seconds
+            long totalSeconds = millisUntilFinished / 1000;
+            long hours = totalSeconds / 3600;
+            long minutes = (totalSeconds % 3600) / 60;
+            long seconds = totalSeconds % 60;
+
+            // Create a StringBuilder to build the remaining time string
+            StringBuilder remainingTimeString = new StringBuilder();
+            remainingTimeString.append("Remaining time: ");
+            // Append hours to the string if not zero
+            if (hours > 0) {
+                remainingTimeString.append(hours).append(" hours ");
+            }
+
+            // Append minutes to the string if not zero
+            if (minutes > 0) {
+                remainingTimeString.append(minutes).append(" minutes ");
+            }
+
+            // Always append seconds
+            remainingTimeString.append(String.format(Locale.getDefault(), "%02d seconds", seconds));
+
+            // Display remaining time in TextView
+            remainingTimeTextView.setText(remainingTimeString.toString());
+        } catch (Exception e) {
+            Log.e("VoterAct", "Error updating remaining time", e);
+            remainingTimeTextView.setText("Error updating remaining time");
         }
-
-        // Always append seconds
-        remainingTimeString.append(String.format(Locale.getDefault(), "%02d seconds", seconds));
-
-        // Display remaining time in TextView
-        remainingTimeTextView.setText(remainingTimeString.toString());
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         // Cancel the countdown timer to prevent memory leaks
         if (countDownTimer != null) {
             countDownTimer.cancel();
+            countDownTimer = null;
         }
     }
 }
