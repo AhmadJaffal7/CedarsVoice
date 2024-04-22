@@ -277,7 +277,7 @@ public class AddSupervisorActivity  extends AppCompatActivity {
             return;
         }
 
-        String url = "http://10.0.2.2/cedarsvoice/add_supervisor.php";
+        String url = "http://192.168.1.136/cedarsvoice/add_supervisor.php";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         // Show the ProgressBar

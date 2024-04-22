@@ -78,18 +78,21 @@ public class VoterAct extends AppCompatActivity {
             }
 
             @Override
-            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                Toast.makeText(getApplicationContext(), "Authentication succeeded!", Toast.LENGTH_SHORT).show();
-                try {
-                    scannedFingerprintData = result.getCryptoObject().getCipher().doFinal();
-                } catch (BadPaddingException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalBlockSizeException e) {
-                    throw new RuntimeException(e);
-                }
-
+public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+    super.onAuthenticationSucceeded(result);
+    try {
+        // Fingerprint authentication succeeded, handle success
+        scannedFingerprintData = result.getCryptoObject().getCipher().doFinal();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(VoterAct.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
             }
+        });
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
             @Override
             public void onAuthenticationFailed() {
@@ -107,50 +110,46 @@ public class VoterAct extends AppCompatActivity {
 
 
 public void VoterLogin(View view) {
-
-
-    String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
-    Log.d("Fingerprint Data", fingerprintData);
     String nid = editTextId.getText().toString().trim();
-    String url = "http://10.0.2.2/cedarsvoice/fingerprint.php";
-    RequestQueue queue = Volley.newRequestQueue(this);
-    StringRequest request = new StringRequest(Request.Method.POST, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Log.d("Response", response);
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        Log.d("Response", jsonResponse.toString());
-                        boolean fingerprintMatch = jsonResponse.getBoolean("fingerprintMatch");
-                        Log.d("Fingerprint Match", String.valueOf(fingerprintMatch));
-                        if (fingerprintMatch) {
-                            login();
-                        } else {
-                            Toast.makeText(VoterAct.this, "Fingerprint doesn't match", Toast.LENGTH_SHORT).show();
+    if (scannedFingerprintData != null && !nid.isEmpty()) {
+        String url = "http://10.0.2.2/cedarsvoice/check_id.php?id=" + nid;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonResponse = new JSONObject(response);
+                            boolean idExists = jsonResponse.getBoolean("exists");
+                            if (idExists) {
+                                login();
+                            } else {
+                                Toast.makeText(VoterAct.this, "ID doesn't exist in the database", Toast.LENGTH_SHORT).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
                     }
-                }
-            },
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(VoterAct.this, "Error occurred" + error.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }) {
-        @Override
-        protected Map<String, String> getParams() {
-            Map<String, String> params = new HashMap<>();
-            params.put("id", nid);
-            params.put("fingerprint", fingerprintData);
-            return params;
-        }
-    };
-    queue.add(request);
-
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(VoterAct.this, "Error occurred" + error.toString(), Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("id", nid);
+                return params;
+            }
+        };
+        queue.add(request);
+    } else {
+        Toast.makeText(VoterAct.this, "Fingerprint doesn't match or ID is empty", Toast.LENGTH_SHORT).show();
+    }
 }
+
 public void AuthenticateFingerprint(View view) {
     try {
         SecretKey secretKey = generateSecretKey();
@@ -170,16 +169,21 @@ public void AuthenticateFingerprint(View view) {
         // Create a BiometricPrompt object
         BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
             @Override
-            public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
-                super.onAuthenticationSucceeded(result);
-                try {
-                    // Fingerprint authentication succeeded, handle success
-                    capturedFingerprintData = result.getCryptoObject().getCipher().doFinal();
-                    Toast.makeText(VoterAct.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+    super.onAuthenticationSucceeded(result);
+    try {
+        // Fingerprint authentication succeeded, handle success
+        scannedFingerprintData = result.getCryptoObject().getCipher().doFinal();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(VoterAct.this, "Fingerprint captured", Toast.LENGTH_SHORT).show();
             }
+        });
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
 
             @Override
             public void onAuthenticationError(int errorCode, CharSequence errString) {
@@ -197,25 +201,21 @@ public void AuthenticateFingerprint(View view) {
     }
 }
 
-
-
-
-
     private void login() {
-        try{
-            Log.d("Login", "Login method called");
-            Intent intent = new Intent(VoterAct.this, VotingAct.class);
-            intent.putExtra("message", "Hello from VoterActivity!");
-            intent.putExtra("voter_id", "logged_in_voter_id"); // replace with actual logged in voter id
-            intent.putExtra("endTime", endTime); // endTime is a String containing the end time
-            startActivity(intent);
-            Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
-        }catch (Exception e) {
-            // Log the exception
-            Log.e("VoterAct", "Error during login", e);
-            // Show an error message to the user
-            Toast.makeText(this, "Error during login. Please try again.", Toast.LENGTH_SHORT).show();
-        }
+    try{
+        Log.d("Login", "Login method called");
+        Intent intent = new Intent(VoterAct.this, VotingAct.class);
+        intent.putExtra("message", "Hello from VoterActivity!");
+        intent.putExtra("voter_id", "logged_in_voter_id"); // replace with actual logged in voter id
+        intent.putExtra("endTime", endTime);
+        startActivity(intent);
+        Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();
+    }catch (Exception e) {
+        // Log the exception
+        Log.e("VoterAct", "Error during login", e);
+        // Show an error message to the user
+        Toast.makeText(this, "Error during login. Please try again.", Toast.LENGTH_SHORT).show();
+    }
 }
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider

@@ -1,5 +1,6 @@
 package com.example.cedarsvoice;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.net.ParseException;
 
@@ -50,7 +52,7 @@ public class VotingAct extends AppCompatActivity {
 
         // Get the voter_id from the intent extras
         voterId = getIntent().getStringExtra("voter_id");
-
+        endTime = getIntent().getStringExtra("endTime");
 
         remainingTimeTextView = findViewById(R.id.remainingTimeTextView);
         // Calculate remaining time
@@ -98,34 +100,70 @@ public class VotingAct extends AppCompatActivity {
     }
 
     public void VoterVote(View view) {
-        String url = "http://10.0.2.2/cedarsvoice/record_vote.php";
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Toast.makeText(VotingAct.this, response, Toast.LENGTH_SHORT).show();
-                    }
-                }, new Response.ErrorListener() {
+    // Create an AlertDialog.Builder object
+    AlertDialog.Builder builder = new AlertDialog.Builder(VotingAct.this);
+    builder.setTitle("Confirmation")
+        .setMessage("Are you sure you want to vote?")
+        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked "Yes", record the vote and logout
+                recordVoteAndLogout();
             }
-        }) {
+        })
+        .setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("voter_id", voterId);
-                String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
-                String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
-                params.put("candidate_id", selectedCandidateId);
-                return params;
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked "No", dismiss the dialog
+                dialog.dismiss();
             }
-        };
+        });
 
-        queue.add(stringRequest);
-    }
+    // Create and show the AlertDialog
+    AlertDialog dialog = builder.create();
+    dialog.show();
+}
+
+private void recordVoteAndLogout() {
+    String url = "http://10.0.2.2/cedarsvoice/record_vote.php";
+    RequestQueue queue = Volley.newRequestQueue(this);
+
+    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Toast.makeText(VotingAct.this, response, Toast.LENGTH_SHORT).show();
+                    // After the vote is recorded, logout the user and go back to the VoterAct page
+                    logout();
+                }
+            }, new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }) {
+        @Override
+        protected Map<String, String> getParams() {
+            Map<String, String> params = new HashMap<>();
+            params.put("voter_id", voterId);
+            String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
+            String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
+            params.put("candidate_id", selectedCandidateId);
+            return params;
+        }
+    };
+
+    queue.add(stringRequest);
+}
+
+public void logout() {
+    // Create an intent to start VoterAct
+    Intent intent = new Intent(VotingAct.this, VoterAct.class);
+    startActivity(intent);
+
+    // Finish the current activity
+    finish();
+}
     private void calculateRemainingTime() {
         try {
             // Parse end time to get hours and minutes

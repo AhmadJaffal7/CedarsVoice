@@ -81,6 +81,7 @@ public class SupervisorActivity extends AppCompatActivity {
                             endTimeEditText.setText(selectedTime);
                             // Store the end time in a string variable
                             endTimeString = selectedTime;
+                            Log.d("SupervisorActivity", "End time: " + endTimeString);
                         }
                     }, hour, minute, false);
             timePickerDialog.show();
