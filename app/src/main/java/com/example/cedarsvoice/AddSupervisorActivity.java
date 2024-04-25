@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -41,7 +42,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -277,59 +277,94 @@ public class AddSupervisorActivity  extends AppCompatActivity {
             return;
         }
 
-        String url = "http://192.168.1.136/cedarsvoice/add_supervisor.php";
-        RequestQueue queue = Volley.newRequestQueue(this);
-
         // Show the ProgressBar
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Hide the ProgressBar
-                                progressBar.setVisibility(View.GONE);
-                                if (response.trim().equals("success")) {
-                                    // Login successful
-                                    Toast.makeText(getApplicationContext(), "Supervisor added successfully", Toast.LENGTH_SHORT).show();
-                                    editTextName.setText("");
-                                    editTextID.setText("");
-                                    capturedFingerprintData = null; // Clear the captured fingerprint data
-                                } else {
-                                    // Login failed
-                                    Log.e("AddSupervisor", response.trim());
-                                    Toast.makeText(getApplicationContext(), "Failed to add supervisor, try again later", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // Hide the ProgressBar
-                                progressBar.setVisibility(View.GONE);
-                                Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
-                                Log.e("VolleyError", error.toString());
-                            }
-                        }) {
-                    @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("supervisor_id", id);
-                        params.put("supervisor_name", name);
-                        params.put("fingerprint_data", fingerprintData);
-                        params.put("police_id", policeId);
-                        return params;
-                    }
-                };
+        String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_supervisor_id.php?supervisor_id=" + id;
+        RequestQueue queue = Volley.newRequestQueue(this);
 
-                queue.add(stringRequest);
-            }
-        });
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        if (response.trim().equals("exists")) {
+                            // Hide the ProgressBar
+                            progressBar.setVisibility(View.GONE);
+                            // Show an AlertDialog
+                            new AlertDialog.Builder(AddSupervisorActivity.this)
+                                    .setTitle("Error")
+                                    .setMessage("Supervisor ID already exists")
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+                        } else {
+                            String url = "http://10.0.2.2/cedarsvoice/add_supervisor.php";
+                            RequestQueue queue = Volley.newRequestQueue(AddSupervisorActivity.this);
+
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+                            executorService.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    // Hide the ProgressBar
+                                                    progressBar.setVisibility(View.GONE);
+                                                    if (response.trim().equals("success")) {
+                                                        // Login successful
+                                                        Toast.makeText(getApplicationContext(), "Supervisor added successfully", Toast.LENGTH_SHORT).show();
+                                                        editTextName.setText("");
+                                                        editTextID.setText("");
+                                                        capturedFingerprintData = null; // Clear the captured fingerprint data
+                                                    } else {
+                                                        // Login failed
+                                                        Log.e("AddSupervisor", response.trim());
+                                                        Toast.makeText(getApplicationContext(), "Failed to add supervisor, try again later", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    // Hide the ProgressBar
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                                                    Log.e("VolleyError", error.toString());
+                                                }
+                                            }) {
+                                        @Override
+                                        protected Map<String, String> getParams() {
+                                            Map<String, String> params = new HashMap<>();
+                                            params.put("supervisor_id", id);
+                                            params.put("supervisor_name", name);
+                                            params.put("fingerprint_data", fingerprintData);
+                                            params.put("police_id", policeId);
+                                            return params;
+                                        }
+                                    };
+                                    // Set the timeout in milliseconds
+                                    stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                                            50000, // 5000ms = 5 seconds
+                                            DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                                            DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+                                    queue.add(stringRequest);
+                                }
+                            });
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                        // Hide the ProgressBar
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+
+        queue.add(stringRequest);
     }
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider

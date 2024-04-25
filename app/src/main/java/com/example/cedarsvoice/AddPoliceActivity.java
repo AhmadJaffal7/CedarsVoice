@@ -220,56 +220,88 @@ public class AddPoliceActivity extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_police_id.php?police_id=" + id;
+        RequestQueue queue = Volley.newRequestQueue(this);
 
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                RequestQueue queue = Volley.newRequestQueue(AddPoliceActivity.this);
-
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-                                // Hide the ProgressBar
-                                progressBar.setVisibility(View.GONE);
-                                if (response.trim().equals("success")) {
-                                    // Login successful
-                                    Toast.makeText(getApplicationContext(), "police added successfully", Toast.LENGTH_SHORT).show();
-                                    editTextName.setText("");
-                                    editTextID.setText("");
-                                    capturedFingerprintData = null; // Clear the captured fingerprint data
-                                } else {
-                                    // Login failed
-                                    Log.e("AddSupervisor", response.trim());
-                                    Toast.makeText(getApplicationContext(), "Failed to add police, try again later", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                // Hide the ProgressBar
-                                progressBar.setVisibility(View.GONE);
-                                // Handle the error
-                                Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
-                                Log.e("VolleyError",error.toString());
-                            }
-                        }) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,
+                new Response.Listener<String>() {
                     @Override
-                    protected Map<String, String> getParams() {
-                        Map<String, String> params = new HashMap<>();
-                        params.put("police_id", id);
-                        params.put("police_name", name);
-                        params.put("fingerprint_data", fingerprintData);
-                        return params;
-                    }
-                };
+                    public void onResponse(String response) {
+                        if (response.trim().equals("exists")) {
+                            // Hide the ProgressBar
+                            progressBar.setVisibility(View.GONE);
+                            // Show an AlertDialog
+                            new AlertDialog.Builder(AddPoliceActivity.this)
+                                    .setTitle("Error")
+                                    .setMessage("Police ID already exists")
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
+                        } else {
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
 
-                queue.add(stringRequest);
-            }
-        });
+                            executorService.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RequestQueue queue = Volley.newRequestQueue(AddPoliceActivity.this);
+
+                                    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    // Hide the ProgressBar
+                                                    progressBar.setVisibility(View.GONE);
+                                                    if (response.trim().equals("success")) {
+                                                        // Login successful
+                                                        Toast.makeText(getApplicationContext(), "police added successfully", Toast.LENGTH_SHORT).show();
+                                                        editTextName.setText("");
+                                                        editTextID.setText("");
+                                                        capturedFingerprintData = null; // Clear the captured fingerprint data
+                                                    } else {
+                                                        // Login failed
+                                                        Log.e("AddSupervisor", response.trim());
+                                                        Toast.makeText(getApplicationContext(), "Failed to add police, try again later", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    // Hide the ProgressBar
+                                                    progressBar.setVisibility(View.GONE);
+                                                    // Handle the error
+                                                    Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                                                    Log.e("VolleyError",error.toString());
+                                                }
+                                            }) {
+                                        @Override
+                                        protected Map<String, String> getParams() {
+                                            Map<String, String> params = new HashMap<>();
+                                            params.put("police_id", id);
+                                            params.put("police_name", name);
+                                            params.put("fingerprint_data", fingerprintData);
+                                            return params;
+                                        }
+                                    };
+
+                                    queue.add(stringRequest);
+                                }
+                            });
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                        // Hide the ProgressBar
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
+
+        queue.add(stringRequest);
     }
+
     private SecretKey generateSecretKey() throws Exception {
         // Get an instance of KeyGenerator with the desired algorithm and provider
         KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");

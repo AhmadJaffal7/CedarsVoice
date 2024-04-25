@@ -57,8 +57,6 @@ public class AddVoterActivity extends AppCompatActivity {
 
     private static final int FILE_PICK_REQUEST_CODE = 1;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -120,61 +118,93 @@ public class AddVoterActivity extends AppCompatActivity {
             return;
         }
 
-        String url = "http://10.0.2.2/cedarsvoice/add_voter.php";
-        RequestQueue queue = Volley.newRequestQueue(this);
-
         // Show the ProgressBar
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+        String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_voter_id.php?national_id=" + nationalID;
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        // Hide the ProgressBar
-                        progressBar.setVisibility(View.GONE);
-                        if (response.trim().equals("success")) {
-                            // Login successful
-                            Toast.makeText(getApplicationContext(), "Voter added successfully", Toast.LENGTH_SHORT).show();
-                            editTextFirstName.setText("");
-                            editTextLastName.setText("");
-                            editTextNationalID.setText("");
-                            capturedFingerprintData = null; // Clear the captured fingerprint data
+                        if (response.trim().equals("exists")) {
+                            // Hide the ProgressBar
+                            progressBar.setVisibility(View.GONE);
+                            // Show an AlertDialog
+                            new AlertDialog.Builder(AddVoterActivity.this)
+                                    .setTitle("Error")
+                                    .setMessage("National ID already exists")
+                                    .setPositiveButton(android.R.string.ok, null)
+                                    .setIcon(android.R.drawable.ic_dialog_alert)
+                                    .show();
                         } else {
-                            // Login failed
-                            Log.e("AddVoter", response.trim());
-                            Toast.makeText(getApplicationContext(), "Failed to add voter, try again later", Toast.LENGTH_SHORT).show();
+                            String url = "http://10.0.2.2/cedarsvoice/add_voter.php";
+                            RequestQueue queue = Volley.newRequestQueue(AddVoterActivity.this);
+                            ExecutorService executorService = Executors.newSingleThreadExecutor();
+                            executorService.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    // Hide the ProgressBar
+                                                    progressBar.setVisibility(View.GONE);
+                                                    if (response.trim().equals("success")) {
+                                                        // Login successful
+                                                        Toast.makeText(getApplicationContext(), "Voter added successfully", Toast.LENGTH_SHORT).show();
+                                                        editTextFirstName.setText("");
+                                                        editTextLastName.setText("");
+                                                        editTextNationalID.setText("");
+                                                        capturedFingerprintData = null; // Clear the captured fingerprint data
+                                                    } else {
+                                                        // Login failed
+                                                        Log.e("AddVoter", response.trim());
+                                                        Toast.makeText(getApplicationContext(), "Failed to add voter, try again later", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    // Hide the ProgressBar
+                                                    progressBar.setVisibility(View.GONE);
+                                                    Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
+                                                    Log.e("VolleyError",error.toString());
+                                                }
+                                            }) {
+                                        @Override
+                                        protected Map<String, String> getParams() {
+                                            Map<String, String> params = new HashMap<>();
+                                            params.put("national_id", nationalID);
+                                            params.put("first_name", firstName);
+                                            params.put("last_name", lastName);
+                                            params.put("fingerprint_data", fingerprintData);
+                                            return params;
+                                        }
+                                    };
+
+                                    queue.add(stringRequest);
+                                }
+                            });
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
                         // Hide the ProgressBar
                         progressBar.setVisibility(View.GONE);
-                        Toast.makeText(getApplicationContext(), "Error: " + error.toString(), Toast.LENGTH_SHORT).show();
-                        Log.e("VolleyError",error.toString());
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("national_id", nationalID);
-                params.put("first_name", firstName);
-                params.put("last_name", lastName);
-                params.put("fingerprint_data", fingerprintData);
-                return params;
-            }
-        };
+                });
 
         queue.add(stringRequest);
-            }
-        });
     }
+
+
 
 
     public void captureFingerprint() {
