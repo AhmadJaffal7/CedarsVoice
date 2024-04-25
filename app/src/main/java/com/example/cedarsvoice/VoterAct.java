@@ -202,11 +202,12 @@ public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult resul
 }
 
     private void login() {
+        String nid = editTextId.getText().toString().trim();
     try{
         Log.d("Login", "Login method called");
         Intent intent = new Intent(VoterAct.this, VotingAct.class);
         intent.putExtra("message", "Hello from VoterActivity!");
-        intent.putExtra("voter_id", "logged_in_voter_id"); // replace with actual logged in voter id
+        intent.putExtra("voter_id", nid); // replace with actual logged in voter id
         intent.putExtra("endTime", endTime);
         startActivity(intent);
         Toast.makeText(VoterAct.this, "ID exists in the database. You can now log in.", Toast.LENGTH_SHORT).show();

@@ -153,12 +153,19 @@ private void recordVoteAndLogout() {
         }
     };
 
+    Log.d("recordVoteAndLogout", "voter_id: " + voterId);
+    String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
+    String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
+    Log.d("recordVoteAndLogout", "candidate_id: " + selectedCandidateId);
+
+
     queue.add(stringRequest);
 }
 
 public void logout() {
     // Create an intent to start VoterAct
     Intent intent = new Intent(VotingAct.this, VoterAct.class);
+    intent.putExtra("endTime", endTime);
     startActivity(intent);
 
     // Finish the current activity
