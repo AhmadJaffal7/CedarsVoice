@@ -37,5 +37,15 @@
         android:layout_below="@id/btnAddVoter"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"/>
+    <Button
+        android:id="@+id/btnresuts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Check Results"
+        android:layout_below="@id/btnAddPolice"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:onClick="CheckResults"
+        />
 
 </RelativeLayout>

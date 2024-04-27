@@ -53,6 +53,12 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
     }
+    public void CheckResults(View view) {
+        // This method will be called when the btnresuts button is clicked
+        // You can start your ResultsAct activity here
+        Intent intent = new Intent(AdminActivity.this, ResultsAct.class);
+        startActivity(intent);
+    }
 
 
 }
