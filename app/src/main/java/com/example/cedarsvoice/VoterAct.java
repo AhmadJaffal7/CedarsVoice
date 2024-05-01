@@ -201,8 +201,44 @@ public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult resul
     }
 }
 
-    private void login() {
-        String nid = editTextId.getText().toString().trim();
+   private void login() {
+    String nid = editTextId.getText().toString().trim();
+    String url = "http://10.0.2.2/cedarsvoice/check_vote.php?id=" + nid; // replace with your server URL
+    RequestQueue queue = Volley.newRequestQueue(this);
+    StringRequest request = new StringRequest(Request.Method.POST, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        boolean hasVoted = jsonResponse.getBoolean("hasVoted");
+                        if (hasVoted) {
+                            Toast.makeText(VoterAct.this, "You have already voted", Toast.LENGTH_SHORT).show();
+                        } else {
+                            proceedWithLogin(nid);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            },
+            new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(VoterAct.this, "Error occurred" + error.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }) {
+        @Override
+        protected Map<String, String> getParams() {
+            Map<String, String> params = new HashMap<>();
+            params.put("id", nid);
+            return params;
+        }
+    };
+    queue.add(request);
+}
+
+private void proceedWithLogin(String nid) {
     try{
         Log.d("Login", "Login method called");
         Intent intent = new Intent(VoterAct.this, VotingAct.class);
