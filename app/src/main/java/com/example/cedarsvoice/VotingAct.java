@@ -125,6 +125,7 @@ public class VotingAct extends AppCompatActivity {
 }
 
 private void recordVoteAndLogout() {
+        
     String url = "http://10.0.2.2/cedarsvoice/record_vote.php";
     RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -133,8 +134,8 @@ private void recordVoteAndLogout() {
                 @Override
                 public void onResponse(String response) {
                     Toast.makeText(VotingAct.this, response, Toast.LENGTH_SHORT).show();
-                    // After the vote is recorded, logout the user and go back to the VoterAct page
-                    logout();
+                    // After the vote is recorded, update the has_voted field in the database
+                    updateHasVotedField();
                 }
             }, new Response.ErrorListener() {
         @Override
@@ -149,15 +150,42 @@ private void recordVoteAndLogout() {
             String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
             String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
             params.put("candidate_id", selectedCandidateId);
+
+            // Log the voter_id and candidate_id
+            Log.d("recordVoteAndLogout", "voter_id: " + voterId);
+            Log.d("recordVoteAndLogout", "candidate_id: " + selectedCandidateId);
+
             return params;
         }
     };
 
-    Log.d("recordVoteAndLogout", "voter_id: " + voterId);
-    String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
-    String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
-    Log.d("recordVoteAndLogout", "candidate_id: " + selectedCandidateId);
+    queue.add(stringRequest);
+}
 
+private void updateHasVotedField() {
+    String url = "http://10.0.2.2/cedarsvoice/update_has_voted.php";
+    RequestQueue queue = Volley.newRequestQueue(this);
+
+    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+            new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    // After the has_voted field is updated, logout the user and go back to the VoterAct page
+                    logout();
+                }
+            }, new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }) {
+        @Override
+        protected Map<String, String> getParams() {
+            Map<String, String> params = new HashMap<>();
+            params.put("voter_id", voterId);
+            return params;
+        }
+    };
 
     queue.add(stringRequest);
 }
