@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -54,9 +53,7 @@ public class AdminActivity extends AppCompatActivity {
         });
     }
     public void CheckResults(View view) {
-        // This method will be called when the btnresuts button is clicked
-        // You can start your ResultsAct activity here
-        Intent intent = new Intent(AdminActivity.this, ResultsAct.class);
+        Intent intent = new Intent(AdminActivity.this, ResultsActivity.class);
         startActivity(intent);
     }
 
