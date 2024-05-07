@@ -3,6 +3,7 @@ package com.example.cedarsvoice;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.icu.util.Calendar;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
@@ -29,11 +30,16 @@ import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class VotingAct extends AppCompatActivity {
     private TextView remainingTimeTextView;
@@ -42,6 +48,8 @@ public class VotingAct extends AppCompatActivity {
     private Spinner spinnerCandidates;
     private HashMap<String, String> candidateNameToIdMap;
     private String voterId;
+    private final String SECRET_KEY = getString(R.string.Key);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +116,11 @@ public class VotingAct extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // User clicked "Yes", record the vote and logout
-                recordVoteAndLogout();
+                try {
+                    recordVoteAndLogout();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         })
         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -124,43 +136,127 @@ public class VotingAct extends AppCompatActivity {
     dialog.show();
 }
 
-private void recordVoteAndLogout() {
-        
-    String url = "http://10.0.2.2/cedarsvoice/record_vote.php";
-    RequestQueue queue = Volley.newRequestQueue(this);
+    private void recordVoteAndLogout() throws Exception {
+        String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
+        String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
+        int candidate_id = Integer.parseInt(selectedCandidateId);
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest getRequest = new StringRequest(Request.Method.GET, "http://10.0.2.2/cedarsvoice/get_vote_count.php?candidate_id="+candidate_id,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            // Decrypt the received encrypted count
+                            int currentVoteCount = decryptVoteCount(response);
+                            // Check if decryption was successful
+                            if (currentVoteCount == -1) {
+                                Toast.makeText(VotingAct.this, "Error decrypting vote count", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            // Increment the count by 1
+                            int newVoteCount = currentVoteCount + 1;
+                            // Encrypt the new count
+                            String encryptedNewVoteCount = encryptVoteCount(newVoteCount);
+                            // Check if encryption was successful
+                            if (encryptedNewVoteCount == null) {
+                                Toast.makeText(VotingAct.this, "Error encrypting vote count", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            // Update the encrypted count in the database
+                            updateVoteCountInDatabase(encryptedNewVoteCount, candidate_id);
 
-    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    Toast.makeText(VotingAct.this, response, Toast.LENGTH_SHORT).show();
-                    // After the vote is recorded, update the has_voted field in the database
-                    updateHasVotedField();
-                }
-            }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        } catch (NumberFormatException e) {
+                            Log.e("VotingAct", "Error parsing vote count: " + response, e);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle the error
+                error.printStackTrace();
+            }
+        });
+
+        queue.add(getRequest);
+    }
+
+    // Method to encrypt the vote count
+    private String encryptVoteCount(int voteCount) {
+        try {
+            // Convert the vote count to bytes
+            byte[] voteCountBytes = String.valueOf(voteCount).getBytes();
+
+            // Initialize cipher for encryption
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            // Encrypt the data
+            byte[] encryptedData = cipher.doFinal(voteCountBytes);
+
+            // Encode the encrypted data to Base64 string
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                return Base64.getEncoder().encodeToString(encryptedData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null; // Error occurred
         }
-    }) {
-        @Override
-        protected Map<String, String> getParams() {
-            Map<String, String> params = new HashMap<>();
-            params.put("voter_id", voterId);
-            String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
-            String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
-            params.put("candidate_id", selectedCandidateId);
+        return null;
+    }
 
-            // Log the voter_id and candidate_id
-            Log.d("recordVoteAndLogout", "voter_id: " + voterId);
-            Log.d("recordVoteAndLogout", "candidate_id: " + selectedCandidateId);
+    // Method to decrypt the vote count
+    private int decryptVoteCount(String encryptedVoteCount) {
+        try {
+            // Decode the Base64 encoded data
+            byte[] encryptedData = android.util.Base64.decode(encryptedVoteCount, android.util.Base64.DEFAULT);
 
-            return params;
+            // Initialize cipher for decryption
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            SecretKey secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+            // Decrypt the data
+            byte[] decryptedData = cipher.doFinal(encryptedData);
+
+            // Convert the decrypted data to integer
+            return Integer.parseInt(new String(decryptedData));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1; // Error occurred
         }
-    };
+    }
 
-    queue.add(stringRequest);
-}
+    private void updateVoteCountInDatabase(String newVoteCount, int candidateId) {
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://10.0.2.2/cedarsvoice/update_vote_count.php";
+
+        StringRequest updateRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Toast.makeText(VotingAct.this, response, Toast.LENGTH_SHORT).show();
+                        updateHasVotedField();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle the error
+                error.printStackTrace();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                // Create a map with the new vote count and candidate id
+                Map<String, String> params = new HashMap<>();
+                params.put("candidate_id", String.valueOf(candidateId));
+                params.put("vote_count", newVoteCount);
+                return params;
+            }
+        };
+
+        queue.add(updateRequest);
+    }
 
 private void updateHasVotedField() {
     String url = "http://10.0.2.2/cedarsvoice/update_has_voted.php";
