@@ -35,6 +35,8 @@ import com.android.volley.toolbox.Volley;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -122,6 +124,11 @@ public class AddVoterActivity extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
+        // Generate a random IV
+        byte[] iv = new byte[16]; // For AES, the IV size is 16 bytes
+        SecureRandom random = new SecureRandom();
+        random.nextBytes(iv);
+
         String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_voter_id.php?national_id=" + nationalID;
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -182,6 +189,7 @@ public class AddVoterActivity extends AppCompatActivity {
                                             params.put("first_name", firstName);
                                             params.put("last_name", lastName);
                                             params.put("fingerprint_data", fingerprintData);
+                                            params.put("fingerprint_iv", Base64.encodeToString(iv, Base64.DEFAULT));
                                             return params;
                                         }
                                     };
@@ -203,9 +211,6 @@ public class AddVoterActivity extends AppCompatActivity {
 
         queue.add(stringRequest);
     }
-
-
-
 
     public void captureFingerprint() {
         try {
@@ -240,7 +245,8 @@ public class AddVoterActivity extends AppCompatActivity {
                     return;
                 }
             }
-            SecretKey secretKey = generateSecretKey();
+            SecretKey secretKey = generateAndStoreSecretKey();
+            Log.e("SecretKey", secretKey.toString());
             // Create a Cipher object for encryption
             Cipher cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7);
 
@@ -262,6 +268,7 @@ public class AddVoterActivity extends AppCompatActivity {
                     try {
                         if (result.getCryptoObject() != null && result.getCryptoObject().getCipher() != null) {
                             capturedFingerprintData = result.getCryptoObject().getCipher().doFinal();
+
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -283,7 +290,8 @@ public class AddVoterActivity extends AppCompatActivity {
                                 Toast.makeText(AddVoterActivity.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
-                        Log.e("FingerprintCapture", "Error: ", e);                    }
+                        Log.e("FingerprintCapture", "Error: ", e);
+                    }
                 }
 
                 @Override
@@ -295,10 +303,10 @@ public class AddVoterActivity extends AppCompatActivity {
                         public void run() {
                             Toast.makeText(AddVoterActivity.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
                         }
-                    });                    Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
+                    });
+                    Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
                 }
             });
-
             // Start the fingerprint authentication process
             biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(cipher));
         } catch (Exception e) {
@@ -359,18 +367,21 @@ public class AddVoterActivity extends AppCompatActivity {
         return outputStream.toByteArray();
     }
 
-
-    private SecretKey generateSecretKey() throws Exception {
-        // Get an instance of KeyGenerator with the desired algorithm and provider
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
-        // Initialize the KeyGenParameterSpec specifying the key alias, purposes, and other parameters
-        KeyGenParameterSpec.Builder builder = new KeyGenParameterSpec.Builder("MyKeyAlias", KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
-                .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-                .setUserAuthenticationRequired(true) // Require user authentication (e.g., fingerprint) for every use of the key
-                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7);
-        // Initialize the KeyGenerator with the KeyGenParameterSpec
-        keyGenerator.init(builder.build());
-        // Generate the secret key
-        return keyGenerator.generateKey();
+    private SecretKey generateAndStoreSecretKey() {
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
+            keyGenerator.init(
+                    new KeyGenParameterSpec.Builder(
+                            "MySecretKeyAlias", // Alias for the key
+                            KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
+                            .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
+                            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
+                            .setUserAuthenticationRequired(true) // Require user authentication (e.g., fingerprint) to access the key
+                            .build());
+            return keyGenerator.generateKey();
+        } catch (Exception e) {
+            Log.e("KeystoreError", "Error generating or storing key", e);
+            return null;
+        }
     }
 }

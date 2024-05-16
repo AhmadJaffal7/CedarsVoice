@@ -48,7 +48,7 @@ public class VotingAct extends AppCompatActivity {
     private Spinner spinnerCandidates;
     private HashMap<String, String> candidateNameToIdMap;
     private String voterId;
-    private final String SECRET_KEY = getString(R.string.Key);
+    private String SECRET_KEY;
 
 
     @Override
@@ -56,6 +56,7 @@ public class VotingAct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_voting);
 
+        SECRET_KEY = getString(R.string.Key);
         spinnerCandidates = findViewById(R.id.candidates);
 
         // Get the voter_id from the intent extras
