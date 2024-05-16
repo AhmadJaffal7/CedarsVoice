@@ -4,31 +4,49 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to Our App!"
-        android:textSize="24sp"
+        android:text="Welcome to Cedars Voice"
+        android:textSize="28sp"
         android:textStyle="bold"
-        android:layout_marginBottom="20dp"/>
+        android:layout_marginBottom="32dp"
+        android:textColor="#00803a"/>
 
     <Button
         android:id="@+id/adminLoginBut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login as Admin"
-        android:padding="13dp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/buttons_bg"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
         android:onClick="loginAdmin"
-        android:layout_marginBottom="10dp" />
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/supervisorLoginBut"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login as Supervisor"
-        android:onClick="loginSupervisor"
-        android:padding="12dp" />
+        android:textColor="#FFFFFF"
+        android:background="@drawable/buttons_bg"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:onClick="loginSupervisor"/>
 
 </LinearLayout>

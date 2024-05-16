@@ -3,15 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFFFFF"
+    >
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars" />
 
     <EditText
         android:id="@+id/editTextSupervisorID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Enter Supervisor ID"
+        android:hint=" Enter Supervisor ID"
         android:inputType="number"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+
+        />
 
     <EditText
         android:id="@+id/editTextPoliceID"
@@ -23,24 +32,17 @@
 
     <Button
         android:id="@+id/btnSupervisorLogin"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Verify Login"
+        android:background="@drawable/buttons_bg"
         android:onClick="verifyLogin"
-        android:textSize="18sp"/>
+        android:text="Verify Login"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:padding="8dp"
+        android:layout_marginLeft="130dp"
+        android:layout_marginTop="20dp"
+        />
 
-    <!-- Add ProgressBar to Show Progress -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center">
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"/>
-    </LinearLayout>
 
 </LinearLayout>

@@ -3,16 +3,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFFFFF"
+    >
 
-    <!-- Title -->
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars" />
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/supervisor_page"
         android:textSize="24sp"
         android:layout_gravity="center"
-        android:layout_marginBottom="16dp"/>
+        android:layout_marginBottom="16dp"
+        android:textColor="#00803a"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:id="@+id/startTimeLabel"
@@ -61,5 +72,8 @@
         android:layout_height="wrap_content"
         android:text="@string/start_election"
         android:layout_marginBottom="16dp"
-        android:onClick="startElection"/>
+        android:onClick="startElection"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        />
 </LinearLayout>

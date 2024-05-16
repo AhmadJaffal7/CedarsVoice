@@ -3,14 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFFFFF"
+    >
+
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars" />
 
     <EditText
         android:id="@+id/editTextName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Candidate Name"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textColor="#00803a"
+        />
 
     <EditText
         android:id="@+id/editTextLastName"
@@ -18,7 +28,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="Last Name"
-        android:inputType="text" />
+        android:inputType="text"
+        android:textColor="#00803a"
+        />
 
     <EditText
         android:id="@+id/editTextAge"
@@ -26,7 +38,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="Age"
-        android:inputType="number" />
+        android:inputType="number"
+        android:textColor="#00803a"
+        />
 
     <EditText
         android:id="@+id/editTextDescription"
@@ -34,7 +48,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="Description"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:textColor="#00803a"
+        />
 
     <Button
         android:id="@+id/buttonAddCandidate"
@@ -43,7 +59,11 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
         android:text="Add Candidate"
-        android:onClick="addCandidate"/>
+        android:onClick="addCandidate"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        />
 
     <!-- Add ProgressBar to Show Progress -->
     <LinearLayout

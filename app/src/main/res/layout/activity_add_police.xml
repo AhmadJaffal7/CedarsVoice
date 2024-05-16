@@ -4,20 +4,32 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".AddVoterActivity">
+    tools:context=".AddVoterActivity"
+
+    android:background="#FFFFFF"
+    >
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars" />
 
     <EditText
         android:id="@+id/editTextPoliceID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Police ID"
-        android:inputType="number"/>
+        android:inputType="number"
+        android:textColor="#00803a"
+        />
 
     <EditText
         android:id="@+id/editTextPoliceName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Name" />
+        android:hint="Name"
+        android:textColor="#00803a"
+        />
 
     <!-- Add Button to Add Fingerprint -->
     <Button
@@ -25,7 +37,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_fingerprint"
-        android:onClick="addFingerprint"/>
+        android:onClick="addFingerprint"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        />
 
     <!-- Add Button to Add Voter -->
     <Button
@@ -33,7 +49,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add_police"
-        android:onClick="addPolice" />
+        android:onClick="addPolice"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="10dp"
+        />
 
     <!-- Add ProgressBar to Show Progress -->
     <LinearLayout

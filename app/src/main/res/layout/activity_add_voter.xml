@@ -4,25 +4,33 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".AddVoterActivity">
+    tools:context=".AddVoterActivity"
+    android:background="#FFFFFF"
+    >
 
     <EditText
         android:id="@+id/editTextFirstName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="First Name" />
+        android:hint="First Name"
+        android:textColor="#00803a"
+        />
 
     <EditText
         android:id="@+id/editTextLastName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Last Name" />
+        android:hint="Last Name"
+        android:textColor="#00803a"
+        />
 
     <EditText
         android:id="@+id/editTextNationalID"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="National ID" />
+        android:hint="National ID"
+        android:textColor="#00803a"
+        />
 
     <!-- Add Button to Add Fingerprint -->
     <Button
@@ -30,7 +38,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Fingerprint"
-        android:onClick="addFingerprint"/>
+        android:onClick="addFingerprint"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        />
 
     <!-- Add Button to Add Voter -->
     <Button
@@ -38,7 +49,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add Voter"
-        android:onClick="addVoter" />
+        android:onClick="addVoter"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"/>
+
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="25dp"
+
+        android:src="@drawable/cedars" />
 
     <!-- Add ProgressBar to Show Progress -->
     <LinearLayout
@@ -52,6 +75,9 @@
             android:layout_height="wrap_content"
             android:indeterminate="true"
             android:visibility="gone"/>
+
+
+
     </LinearLayout>
 
 </LinearLayout>

@@ -6,25 +6,34 @@
     android:layout_height="match_parent"
     tools:context=".VotingAct"
     android:orientation="vertical"
+    android:background="#FFFFFF"
     >
     <TextView
         android:id="@+id/remainingTimeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Remaining Time: "
-        android:textSize="18sp"
-        android:layout_marginTop="16dp"/>
+        android:textSize="25sp"
+        android:layout_marginTop="16dp"
+        android:textColor="#00803a"
+        android:textStyle="bold"
+        />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Candidates"
         android:textSize="30sp"
+        android:textColor="#00803a"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="40dp"
         />
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/candidates"
+
         />
 
     <Button
@@ -33,8 +42,21 @@
         android:onClick="VoterVote"
         android:text="VOTE"
         android:textSize="30sp"
-        android:layout_marginTop="400dp"
+        android:layout_marginTop="100dp"
         android:layout_marginLeft="140dp"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="15dp"
         />
+
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="40dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginLeft="30dp"
+
+        android:src="@drawable/cedars" />
+
 
 </LinearLayout>

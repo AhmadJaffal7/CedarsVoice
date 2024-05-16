@@ -1,51 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical"
+    >
 
-    <!-- Add UI elements for adding candidates, supervisors, and voters -->
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars"
+        android:layout_gravity="center"
+
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ADMIN PANEL"
+        android:textSize="30sp"
+        android:textColor="#00803a"
+        android:textStyle="bold"
+        android:layout_marginLeft="110sp"
+        />
+
     <Button
         android:id="@+id/btnAddCandidate"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Add Candidate"
         android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginLeft="130dp"
+        android:textSize="15dp"
+        />
 
     <Button
         android:id="@+id/btnAddSupervisor"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Add Supervisor"
         android:layout_below="@id/btnAddCandidate"
         android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginLeft="130dp"
+        android:textSize="15dp"
+        />
 
     <Button
         android:id="@+id/btnAddVoter"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Add Voter"
         android:layout_below="@id/btnAddSupervisor"
         android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginLeft="130dp"
+        android:textSize="15dp"
+        />
     <Button
         android:id="@+id/btnAddPolice"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Add Police"
         android:layout_below="@id/btnAddVoter"
         android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginLeft="130dp"
+        android:textSize="15dp"
+        />
     <Button
         android:id="@+id/btnResults"
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:text="Check Results"
         android:layout_below="@id/btnAddPolice"
         android:layout_marginTop="20dp"
         android:layout_centerHorizontal="true"
         android:onClick="CheckResults"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:padding="10dp"
+        android:layout_marginLeft="130dp"
+        android:textSize="15dp"
         />
 
-</RelativeLayout>
+</LinearLayout>

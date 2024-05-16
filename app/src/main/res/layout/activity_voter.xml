@@ -5,44 +5,77 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".VoterAct"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#FFFFFF"
+    >
 
     <TextView
         android:id="@+id/remainingTimeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Remaining Time: "
-        android:textSize="18sp"
-        android:layout_marginTop="16dp"/>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Voter"
-        android:textSize="40sp" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="National Id:"
         android:textSize="20sp"
+        android:layout_marginTop="16dp"
+        android:textColor="#00803a"
+        android:textStyle="bold"
+        android:layout_marginLeft="5dp"
         />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Voter Panel"
+        android:textSize="40sp"
+        android:textColor="#00803a"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="5dp"
+        />
+
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Id"
+        android:text="National Id"
         android:textSize="20dp"
         android:id="@+id/Nid"
+        android:textColor="#00803a"
         />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
-        android:textSize="25sp"
+        android:textSize="15sp"
         android:onClick="VoterLogin"
         android:id="@+id/editTextId"
+        android:background="@drawable/buttons_bg"
+        android:textColor="#FFFFFF"
+        android:layout_marginTop="13dp"
+        android:layout_marginLeft="10dp"
+        android:padding="15dp"
         />
+<Button
+    android:id="@+id/buttonCaptureFingerprint"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Authenticate Fingerprint"
+    android:layout_below="@id/editTextId"
+    android:layout_centerHorizontal="true"
+    android:layout_marginTop="20dp"
+    android:onClick="AuthenticateFingerprint"
+    android:background="@drawable/buttons_bg"
+    android:textColor="#FFFFFF"
+    android:textSize="15dp"
+    android:padding="10dp"
+    android:layout_marginLeft="10dp"
+    />
 
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="50dp"
+        />
 
 
 

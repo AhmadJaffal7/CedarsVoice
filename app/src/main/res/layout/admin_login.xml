@@ -4,7 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="#FFFFFF"
+    >
+    <ImageView
+        android:layout_width="335dp"
+        android:layout_height="166dp"
+        android:layout_marginBottom="32dp"
+        android:src="@drawable/cedars" />
 
     <EditText
         android:id="@+id/editTextID"
@@ -25,12 +32,15 @@
 
     <Button
         android:id="@+id/admin_login_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Login"
         android:onClick="login"
         android:textSize="18dp"
-        android:padding="12dp" />
+        android:padding="5dp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/buttons_bg"
+        />
 
     <!-- Add ProgressBar to Show Progress -->
     <LinearLayout
