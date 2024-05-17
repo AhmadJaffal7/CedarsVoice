@@ -1,4 +1,5 @@
 <?php
+
 require_once('config.php');
 
 try {
@@ -8,12 +9,11 @@ try {
     $last_name = $pdo->quote($_POST['last_name']);
     $national_id = $pdo->quote($_POST['national_id']);
     $fingerprint_data = $pdo->quote($_POST['fingerprint_data']);
+    $fingerprint_iv = $pdo->quote($_POST['fingerprint_iv']);
 
-    // $fingerprint_data = base64_decode($fingerprint_data);
-
-    // Insert voter details and fingerprint data into the database
-    $query = "INSERT INTO voters (voter_id, voter_name, voter_last_name, voter_fingerprint) 
-              VALUES ($national_id, $first_name, $last_name, $fingerprint_data)";
+    // Insert voter details, fingerprint data, and fingerprint IV into the database
+    $query = "INSERT INTO voters (voter_id, voter_name, voter_last_name, voter_fingerprint, fingerprint_iv)
+              VALUES ($national_id, $first_name, $last_name, $fingerprint_data, $fingerprint_iv)";
 
     if ($pdo->exec($query)) {
         echo "success";
