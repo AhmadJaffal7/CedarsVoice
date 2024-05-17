@@ -49,7 +49,7 @@ public class VotingAct extends AppCompatActivity {
     private HashMap<String, String> candidateNameToIdMap;
     private String voterId;
     private String SECRET_KEY;
-
+    private int electionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,13 +61,10 @@ public class VotingAct extends AppCompatActivity {
 
         // Get the voter_id from the intent extras
         voterId = getIntent().getStringExtra("voter_id");
-        endTime = getIntent().getStringExtra("endTime");
 
+        electionId = getIntent().getIntExtra("election_id",0);
         remainingTimeTextView = findViewById(R.id.remainingTimeTextView);
-        // Calculate remaining time
-        calculateRemainingTime();
-        // Start the countdown timer
-        startCountdownTimer();
+        fetchEndTimeFromDatabase();
 
         fetchCandidateNames();
     }
@@ -109,40 +106,40 @@ public class VotingAct extends AppCompatActivity {
     }
 
     public void VoterVote(View view) {
-    // Create an AlertDialog.Builder object
-    AlertDialog.Builder builder = new AlertDialog.Builder(VotingAct.this);
-    builder.setTitle("Confirmation")
-        .setMessage("Are you sure you want to vote?")
-        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // User clicked "Yes", record the vote and logout
-                try {
-                    recordVoteAndLogout();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        })
-        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // User clicked "No", dismiss the dialog
-                dialog.dismiss();
-            }
-        });
+        // Create an AlertDialog.Builder object
+        AlertDialog.Builder builder = new AlertDialog.Builder(VotingAct.this);
+        builder.setTitle("Confirmation")
+                .setMessage("Are you sure you want to vote?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked "Yes", record the vote and logout
+                        try {
+                            recordVoteAndLogout();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User clicked "No", dismiss the dialog
+                        dialog.dismiss();
+                    }
+                });
 
-    // Create and show the AlertDialog
-    AlertDialog dialog = builder.create();
-    dialog.show();
-}
+        // Create and show the AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
 
     private void recordVoteAndLogout() throws Exception {
         String selectedCandidateName = spinnerCandidates.getSelectedItem().toString();
         String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
         int candidate_id = Integer.parseInt(selectedCandidateId);
         RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest getRequest = new StringRequest(Request.Method.GET, "http://10.0.2.2/cedarsvoice/get_vote_count.php?candidate_id="+candidate_id,
+        StringRequest getRequest = new StringRequest(Request.Method.GET, "http://10.0.2.2/cedarsvoice/get_vote_count.php?candidate_id=" + candidate_id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -259,70 +256,112 @@ public class VotingAct extends AppCompatActivity {
         queue.add(updateRequest);
     }
 
-private void updateHasVotedField() {
-    String url = "http://10.0.2.2/cedarsvoice/update_has_voted.php";
-    RequestQueue queue = Volley.newRequestQueue(this);
+    private void updateHasVotedField() {
+        String url = "http://10.0.2.2/cedarsvoice/update_has_voted.php";
+        RequestQueue queue = Volley.newRequestQueue(this);
 
-    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-            new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // After the has_voted field is updated, logout the user and go back to the VoterAct page
-                    logout();
-                }
-            }, new Response.ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-            Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }) {
-        @Override
-        protected Map<String, String> getParams() {
-            Map<String, String> params = new HashMap<>();
-            params.put("voter_id", voterId);
-            return params;
-        }
-    };
-
-    queue.add(stringRequest);
-}
-
-public void logout() {
-    // Create an intent to start VoterAct
-    Intent intent = new Intent(VotingAct.this, VoterAct.class);
-    intent.putExtra("endTime", endTime);
-    startActivity(intent);
-
-    // Finish the current activity
-    finish();
-}
-    private void calculateRemainingTime() {
-        try {
-            // Parse end time to get hours and minutes
-            String[] endTimeParts = endTime.split(":");
-            int endHour = Integer.parseInt(endTimeParts[0]);
-            int endMinute = Integer.parseInt(endTimeParts[1]);
-
-            // Get current time
-            Calendar currentTime = Calendar.getInstance();
-            int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
-            int currentMinute = currentTime.get(Calendar.MINUTE);
-
-            // Calculate remaining time in minutes
-            int remainingMinutes = (endHour - currentHour) * 60 + (endMinute - currentMinute);
-
-            // Check if end time is the next day
-            if (remainingMinutes < 0) {
-                remainingMinutes += 24 * 60; // Add 24 hours
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // After the has_voted field is updated, logout the user and go back to the VoterAct page
+                        logout();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("voter_id", voterId);
+                return params;
+            }
+        };
 
-            // Convert remaining time to hours and minutes
-            int remainingHours = remainingMinutes / 60;
-            int remainingMinutesAfterHours = remainingMinutes % 60;
+        queue.add(stringRequest);
+    }
 
-            // Display remaining time in TextView
-            String remainingTimeString = String.format(Locale.getDefault(), "%d hours %d minutes", remainingHours, remainingMinutesAfterHours);
-            remainingTimeTextView.setText(remainingTimeString);
+    public void logout() {
+        // Create an intent to start VoterAct
+        Intent intent = new Intent(VotingAct.this, VoterAct.class);
+        intent.putExtra("endTime", endTime);
+        startActivity(intent);
+
+        // Finish the current activity
+        finish();
+    }
+
+    private void fetchEndTimeFromDatabase() {
+        String url = "http://10.0.2.2/cedarsvoice/get_end_time.php?electionId=" + electionId; // Replace with your server URL
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle the server's response
+                        Log.d("VoterAct", "Server Response: " + response);
+                        String endTime = response.trim(); // Assuming the server returns only the end time
+
+                        if (!endTime.isEmpty()) {
+                            // Calculate remaining time
+                            calculateRemainingTime(endTime);
+                            // Start the countdown timer
+                            startCountdownTimer(endTime);
+                        } else {
+                            Log.e("VoterAct", "End time is empty");
+                            remainingTimeTextView.setText("End time is not set");
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle the error
+                        Log.e("VoterAct", "Error fetching end time: " + error.getMessage());
+                        remainingTimeTextView.setText("Error fetching end time");
+                    }
+                });
+
+        // Add the request to the Volley request queue
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(stringRequest);
+    }
+
+    private void calculateRemainingTime(String endTime) {
+        try {
+            if (endTime != null) {
+                // Parse end time to get hours and minutes
+                String[] endTimeParts = endTime.split(":");
+                int endHour = Integer.parseInt(endTimeParts[0]);
+                int endMinute = Integer.parseInt(endTimeParts[1]);
+
+                // Get current time
+                Calendar currentTime = Calendar.getInstance();
+                int currentHour = currentTime.get(Calendar.HOUR_OF_DAY);
+                int currentMinute = currentTime.get(Calendar.MINUTE);
+
+                // Calculate remaining time in minutes
+                int remainingMinutes = (endHour - currentHour) * 60 + (endMinute - currentMinute);
+
+                // Check if end time is the next day
+                if (remainingMinutes < 0) {
+                    remainingMinutes += 24 * 60; // Add 24 hours
+                }
+
+                // Convert remaining time to hours and minutes
+                int remainingHours = remainingMinutes / 60;
+                int remainingMinutesAfterHours = remainingMinutes % 60;
+
+                // Display remaining time in TextView
+                String remainingTimeString = String.format(Locale.getDefault(), "%d hours %d minutes", remainingHours, remainingMinutesAfterHours);
+                remainingTimeTextView.setText(remainingTimeString);
+            } else {
+                Log.e("VotingAct", "End time is null");
+                remainingTimeTextView.setText("End time is not set");
+            }
         } catch (NumberFormatException e) {
             Log.e("VotingAct", "Error parsing end time", e);
             remainingTimeTextView.setText("Error parsing end time");
@@ -331,7 +370,8 @@ public void logout() {
             remainingTimeTextView.setText("Error splitting end time");
         }
     }
-    private void startCountdownTimer() {
+
+    private void startCountdownTimer(String endTime) {
         if (endTime == null || endTime.isEmpty()) {
             Log.e("VotingAct", "End time is null or empty");
             remainingTimeTextView.setText("End time is not set");
@@ -367,10 +407,7 @@ public void logout() {
 
                 @Override
                 public void onFinish() {
-                    // Close VoterActivity and open SupervisorActivity
-                    Intent intent = new Intent(VotingAct.this, SupervisorActivity.class);
-                    startActivity(intent);
-                    finish(); // Close current activity
+                    logout();
                 }
             }.start();
         } catch (ParseException e) {
@@ -381,6 +418,7 @@ public void logout() {
             remainingTimeTextView.setText("Error parsing end time");
         }
     }
+
     private void updateRemainingTime(long millisUntilFinished) {
         if (millisUntilFinished <= 0) {
             Log.e("VotingAct", "Time has already finished");
@@ -418,6 +456,7 @@ public void logout() {
             remainingTimeTextView.setText("Error updating remaining time");
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

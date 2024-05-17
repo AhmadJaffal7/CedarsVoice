@@ -4,80 +4,89 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".VoterAct"
-    android:orientation="vertical"
     android:background="#FFFFFF"
-    >
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".VoterAct">
 
-    <TextView
-        android:id="@+id/remainingTimeTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Remaining Time: "
-        android:textSize="20sp"
-        android:layout_marginTop="16dp"
-        android:textColor="#00803a"
-        android:textStyle="bold"
-        android:layout_marginLeft="5dp"
-        />
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/clockIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_clock"
+            android:contentDescription="Clock Icon"
+            android:layout_marginEnd="6dp" />
+
+        <TextView
+            android:id="@+id/remainingTimeTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Remaining Time"
+            android:textColor="#00803a"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/delayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Delay"
+            android:textSize="15sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/buttons_bg"
+            android:paddingHorizontal="20dp"
+            android:onClick="DelayTime" />
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Voter Panel"
-        android:textSize="40sp"
+        android:layout_marginTop="16dp"
+        android:text="Voter Login"
         android:textColor="#00803a"
-        android:layout_marginBottom="15dp"
-        android:layout_marginLeft="5dp"
-        />
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:gravity="center" />
 
     <EditText
+        android:id="@+id/Nid"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="National Id"
-        android:textSize="20dp"
-        android:id="@+id/Nid"
+        android:layout_marginTop="16dp"
+        android:hint="National Id"
         android:textColor="#00803a"
-        />
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:background="@drawable/edit_text_bg" />
+
     <Button
-        android:layout_width="wrap_content"
+        android:id="@+id/butLogin"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Login"
-        android:textSize="15sp"
-        android:onClick="VoterLogin"
-        android:id="@+id/editTextId"
+        android:layout_marginTop="16dp"
         android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="13dp"
-        android:layout_marginLeft="10dp"
+        android:onClick="VoterLogin"
         android:padding="15dp"
-        />
-<Button
-    android:id="@+id/buttonCaptureFingerprint"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Authenticate Fingerprint"
-    android:layout_below="@id/editTextId"
-    android:layout_centerHorizontal="true"
-    android:layout_marginTop="20dp"
-    android:onClick="AuthenticateFingerprint"
-    android:background="@drawable/buttons_bg"
-    android:textColor="#FFFFFF"
-    android:textSize="15dp"
-    android:padding="10dp"
-    android:layout_marginLeft="10dp"
-    />
+        android:text="Login"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
 
     <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/cedars"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="50dp"
-        />
-
-
-
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="16dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
+        android:src="@drawable/cedars" />
 
 </LinearLayout>

@@ -1,11 +1,13 @@
 package com.example.cedarsvoice;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.net.ParseException;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.hardware.fingerprint.FingerprintManager;
 import android.icu.util.Calendar;
@@ -13,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.security.keystore.KeyProperties;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -49,10 +52,11 @@ import javax.crypto.spec.IvParameterSpec;
 public class VoterAct extends AppCompatActivity {
     EditText editTextId;
     private TextView remainingTimeTextView;
-    private String endTime;
     private CountDownTimer countDownTimer;
     private Executor executor;
     SecretKey secretKey;
+    private int electionId;
+    private String current_endTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +64,13 @@ public class VoterAct extends AppCompatActivity {
         setContentView(R.layout.activity_voter);
 
         secretKey = getStoredSecretKey();
-        // Retrieve the end time passed from AdminActivity
-        endTime = getIntent().getStringExtra("endTime");
+
+        electionId = getIntent().getIntExtra("election_id",0);
         remainingTimeTextView = findViewById(R.id.remainingTimeTextView);
-        // Calculate remaining time
-        calculateRemainingTime();
-        // Start the countdown timer
-        startCountdownTimer();
+        fetchEndTimeFromDatabase();
+
         editTextId = findViewById(R.id.Nid);
+
         executor = Executors.newSingleThreadExecutor();
     }
 
@@ -241,6 +244,8 @@ public class VoterAct extends AppCompatActivity {
         }
     }
 
+
+
     interface FingerprintCallback {
         void onFingerprintReceived(byte[] fingerprint);
         void onError(String error);
@@ -339,50 +344,50 @@ public class VoterAct extends AppCompatActivity {
             return null;
         }
     }
-    private void login() {
-        String nid = editTextId.getText().toString().trim();
-        String url = "http://10.0.2.2/cedarsvoice/check_vote.php?id=" + nid; // replace with your server URL
-        RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest request = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonResponse = new JSONObject(response);
-                            boolean hasVoted = jsonResponse.getBoolean("hasVoted");
-                            if (hasVoted) {
-                                Toast.makeText(VoterAct.this, "You have already voted", Toast.LENGTH_SHORT).show();
-                            } else {
-                                proceedWithLogin(nid);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(VoterAct.this, "Error occurred" + error.toString(), Toast.LENGTH_SHORT).show();
-                    }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("id", nid);
-                return params;
-            }
-        };
-        queue.add(request);
-    }
+//    private void login() {
+//        String nid = editTextId.getText().toString().trim();
+//        String url = "http://10.0.2.2/cedarsvoice/check_vote.php?id=" + nid; // replace with your server URL
+//        RequestQueue queue = Volley.newRequestQueue(this);
+//        StringRequest request = new StringRequest(Request.Method.POST, url,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        try {
+//                            JSONObject jsonResponse = new JSONObject(response);
+//                            boolean hasVoted = jsonResponse.getBoolean("hasVoted");
+//                            if (hasVoted) {
+//                                Toast.makeText(VoterAct.this, "You have already voted", Toast.LENGTH_SHORT).show();
+//                            } else {
+//                                proceedWithLogin(nid);
+//                            }
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Toast.makeText(VoterAct.this, "Error occurred" + error.toString(), Toast.LENGTH_SHORT).show();
+//                    }
+//                }) {
+//            @Override
+//            protected Map<String, String> getParams() {
+//                Map<String, String> params = new HashMap<>();
+//                params.put("id", nid);
+//                return params;
+//            }
+//        };
+//        queue.add(request);
+//    }
 
     private void proceedWithLogin(String nid) {
         try{
             Log.d("Login", "Login method called");
             Intent intent = new Intent(VoterAct.this, VotingAct.class);
             intent.putExtra("message", "Hello from VoterActivity!");
-            intent.putExtra("voter_id", nid); // replace with actual logged in voter id
-            intent.putExtra("endTime", endTime);
+            intent.putExtra("voter_id", nid);
+            intent.putExtra("election_id", electionId);
             startActivity(intent);
             Toast.makeText(VoterAct.this, "Logged in Successfully.", Toast.LENGTH_SHORT).show();
         }catch (Exception e) {
@@ -404,7 +409,44 @@ public class VoterAct extends AppCompatActivity {
         }
     }
 
-    private void calculateRemainingTime() {
+    private void fetchEndTimeFromDatabase() {
+        String url = "http://10.0.2.2/cedarsvoice/get_end_time.php?electionId=" + electionId; // Replace with your server URL
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle the server's response
+                        Log.d("VoterAct", "Server Response: " + response);
+                        String endTime = response.trim(); // Assuming the server returns only the end time
+
+                        if (!endTime.isEmpty()) {
+                            current_endTime = endTime;
+                            // Calculate remaining time
+                            calculateRemainingTime(endTime);
+                            // Start the countdown timer
+                            startCountdownTimer(endTime);
+                        } else {
+                            Log.e("VoterAct", "End time is empty");
+                            remainingTimeTextView.setText("End time is not set");
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle the error
+                        Log.e("VoterAct", "Error fetching end time: " + error.getMessage());
+                        remainingTimeTextView.setText("Error fetching end time");
+                    }
+                });
+
+        // Add the request to the Volley request queue
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(stringRequest);
+    }
+
+    private void calculateRemainingTime(String endTime) {
         try {
             if (endTime != null) {
                 // Parse end time to get hours and minutes
@@ -444,7 +486,7 @@ public class VoterAct extends AppCompatActivity {
             remainingTimeTextView.setText("Error splitting end time");
         }
     }
-    private void startCountdownTimer() {
+    private void startCountdownTimer(String endTime) {
         if (endTime == null || endTime.isEmpty()) {
             Log.e("VoterAct", "End time is null or empty");
             remainingTimeTextView.setText("End time is not set");
@@ -510,19 +552,19 @@ public class VoterAct extends AppCompatActivity {
 
             // Create a StringBuilder to build the remaining time string
             StringBuilder remainingTimeString = new StringBuilder();
-            remainingTimeString.append("Remaining time: ");
+
             // Append hours to the string if not zero
             if (hours > 0) {
-                remainingTimeString.append(hours).append(" hours ");
+                remainingTimeString.append(hours).append(":");
             }
 
             // Append minutes to the string if not zero
             if (minutes > 0) {
-                remainingTimeString.append(minutes).append(" minutes ");
+                remainingTimeString.append(minutes);
             }
 
             // Always append seconds
-            remainingTimeString.append(String.format(Locale.getDefault(), "%02d seconds", seconds));
+            remainingTimeString.append(String.format(Locale.getDefault(), ":%02d ", seconds));
 
             // Display remaining time in TextView
             remainingTimeTextView.setText(remainingTimeString.toString());
@@ -540,4 +582,102 @@ public class VoterAct extends AppCompatActivity {
             countDownTimer = null;
         }
     }
+
+    public void DelayTime(View view) {
+        showDelayTimeDialog();
+    }
+    private void showDelayTimeDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Delay Time");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setHint("Enter minutes to delay");
+        builder.setView(input);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String delayMinutesStr = input.getText().toString();
+                if (!delayMinutesStr.isEmpty()) {
+                    int delayMinutes = Integer.parseInt(delayMinutesStr);
+                    updateEndTime(delayMinutes);
+                } else {
+                    Toast.makeText(VoterAct.this, "Delay minutes cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void updateEndTime(int delayMinutes) {
+        if (current_endTime != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            try {
+                Date endTime = sdf.parse(current_endTime);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(endTime);
+                calendar.add(Calendar.MINUTE, delayMinutes);
+                String newEndTime = sdf.format(calendar.getTime());
+
+                // Now update the new end_time in the MySQL database
+                updateEndTimeInDatabase(newEndTime);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (java.text.ParseException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            Toast.makeText(VoterAct.this, "Current end time is not set", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateEndTimeInDatabase(final String newEndTime) {
+        String url = "http://10.0.2.2/cedarsvoice/update_end_time.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle the server's response
+                        Log.d("VoterAct", "Update End Time Response: " + response);
+                        Toast.makeText(VoterAct.this, "End time updated successfully", Toast.LENGTH_SHORT).show();
+                        // Update the end time in the UI
+                        current_endTime = newEndTime;
+                        calculateRemainingTime(newEndTime);
+                        //Restart the countdown timer with the new end time
+                        countDownTimer.cancel();
+                        startCountdownTimer(newEndTime);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle the error
+                        Log.e("VoterAct", "Error updating end time: " + error.getMessage());
+                        // Optionally, you can handle the error if needed
+                        Toast.makeText(VoterAct.this, "Failed to update end time", Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("end_time", newEndTime);
+                params.put("electionId", String.valueOf(electionId));
+                return params;
+            }
+        };
+
+        // Add the request to the Volley request queue
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(stringRequest);
+    }
+
 }
