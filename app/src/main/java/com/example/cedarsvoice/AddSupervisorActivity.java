@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 
@@ -72,11 +73,29 @@ public class AddSupervisorActivity  extends AppCompatActivity {
         spinnerPoliceID = findViewById(R.id.spinnerPoliceID);
 
         executor = Executors.newSingleThreadExecutor();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Disable title
+        getSupportActionBar().setTitle("");
+
+        // Set navigation icon click listener
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate back to the Admin Activity
+                Intent intent = new Intent(AddSupervisorActivity.this, AdminActivity.class);
+                startActivity(intent);
+                finish(); // Optional: close current activity
+            }
+        });
+
         fetchPoliceIds();
     }
 
     private void fetchPoliceIds() {
-        String url = "http://10.0.2.2/cedarsvoice/get_police_ids.php";
+        String url = getString(R.string.server)+"get_police_ids.php";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -281,7 +300,7 @@ public class AddSupervisorActivity  extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_supervisor_id.php?supervisor_id=" + id;
+        String checkIDUrl = getString(R.string.server)+"check_supervisor_id.php?supervisor_id=" + id;
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,
@@ -299,7 +318,7 @@ public class AddSupervisorActivity  extends AppCompatActivity {
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .show();
                         } else {
-                            String url = "http://10.0.2.2/cedarsvoice/add_supervisor.php";
+                            String url = getString(R.string.server)+"add_supervisor.php";
                             RequestQueue queue = Volley.newRequestQueue(AddSupervisorActivity.this);
 
                             ExecutorService executorService = Executors.newSingleThreadExecutor();

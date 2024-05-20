@@ -2,78 +2,70 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_color"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFFFFF"
-    >
+    android:padding="16dp">
 
     <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/cedars" />
-
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:src="@drawable/cedars"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:layout_marginBottom="32dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/supervisor_page"
-        android:textSize="24sp"
         android:layout_gravity="center"
         android:layout_marginBottom="16dp"
-        android:textColor="#00803a"
-        android:textStyle="bold"
-        />
+        android:text="Start Election"
+        android:textColor="@color/text_color"
+        android:textSize="24sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/startTimeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Time:"
-        android:visibility="gone"/>
+        android:textColor="@color/text_color" />
 
     <EditText
         android:id="@+id/startTimeEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="none"
         android:focusable="false"
-        android:visibility="gone"
-        android:onClick="showStartTimePicker"/>
+        android:inputType="none"
+        android:onClick="showStartTimePicker"
+        android:textColor="@color/text_color"
+        android:background="@drawable/edit_text_bg" />
 
     <TextView
         android:id="@+id/endTimeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="End Time:"
-        android:visibility="gone"/>
+        android:textColor="@color/text_color" />
 
     <EditText
         android:id="@+id/endTimeEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="none"
         android:focusable="false"
-        android:visibility="gone"
-        android:onClick="showEndTimePicker"/>
+        android:inputType="none"
+        android:onClick="showEndTimePicker"
+        android:textColor="@color/text_color"
+        android:background="@drawable/edit_text_bg" />
 
     <Button
         android:id="@+id/butStart"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start"
-        android:onClick="saveTimes"
-        android:visibility="gone"/>
-
-    <!-- Button to Start Election -->
-    <Button
-        android:id="@+id/butStartElection"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/start_election"
-        android:layout_marginBottom="16dp"
-        android:onClick="startElection"
+        android:layout_marginTop="16dp"
         android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        />
+        android:onClick="saveTimes"
+        android:text="Start"
+        android:textColor="#FFFFFF" />
+
 </LinearLayout>

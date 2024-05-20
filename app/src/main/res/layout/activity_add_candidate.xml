@@ -1,82 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#FFFFFF"
-    >
+    android:background="#FFFFFF">
 
-    <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/cedars" />
-
-    <EditText
-        android:id="@+id/editTextName"
+    <!-- App Bar with Back Button and Text View -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Candidate Name"
-        android:inputType="text"
-        android:textColor="#00803a"
-        />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="4dp">
 
-    <EditText
-        android:id="@+id/editTextLastName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Last Name"
-        android:inputType="text"
-        android:textColor="#00803a"
-        />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00803a"
+            app:titleTextColor="#FFFFFF"
+            app:navigationIcon="@drawable/ic_back">
 
-    <EditText
-        android:id="@+id/editTextAge"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Age"
-        android:inputType="number"
-        android:textColor="#00803a"
-        />
+            <!-- TextView in the App Bar -->
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Candidate"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"/>
 
-    <EditText
-        android:id="@+id/editTextDescription"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Description"
-        android:inputType="textMultiLine"
-        android:textColor="#00803a"
-        />
+        </androidx.appcompat.widget.Toolbar>
 
-    <Button
-        android:id="@+id/buttonAddCandidate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:text="Add Candidate"
-        android:onClick="addCandidate"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        android:padding="10dp"
-        />
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Add ProgressBar to Show Progress -->
     <LinearLayout
+        android:id="@+id/contentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:layout_below="@id/toolbar"
+        android:padding="16dp"
+        tools:ignore="NotSibling">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="190dp"
+            android:layout_marginBottom="32dp"
+            android:layout_marginTop="48dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cedars" />
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"/>
+            android:background="@drawable/edit_text_bg"
+            android:hint="Candidate Name"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="#00803a" />
+
+        <EditText
+            android:id="@+id/editTextLastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Last Name"
+            android:inputType="text"
+            android:padding="12dp"
+            android:textColor="#00803a" />
+
+        <EditText
+            android:id="@+id/editTextAge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Age"
+            android:inputType="number"
+            android:padding="12dp"
+            android:textColor="#00803a" />
+
+        <Button
+            android:id="@+id/buttonAddCandidate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="addCandidate"
+            android:text="Add Candidate"
+            android:textColor="#FFFFFF" />
+
     </LinearLayout>
 
-</LinearLayout>
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

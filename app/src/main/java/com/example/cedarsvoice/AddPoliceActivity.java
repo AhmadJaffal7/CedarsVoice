@@ -18,10 +18,12 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 
@@ -62,6 +64,23 @@ public class AddPoliceActivity extends AppCompatActivity {
         editTextName = findViewById(R.id.editTextPoliceName);
 
         executor = Executors.newSingleThreadExecutor();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Disable title
+        getSupportActionBar().setTitle("");
+
+        // Set navigation icon click listener
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate back to the Admin Activity
+                Intent intent = new Intent(AddPoliceActivity.this, AdminActivity.class);
+                startActivity(intent);
+                finish(); // Optional: close current activity
+            }
+        });
     }
 
     public void addFingerprint(View view) {
@@ -214,13 +233,13 @@ public class AddPoliceActivity extends AppCompatActivity {
 
         String fingerprintData = Base64.encodeToString(capturedFingerprintData, Base64.DEFAULT);
 
-        String url = "http://10.0.2.2/cedarsvoice/add_police.php";
+        String url = getString(R.string.server)+"add_police.php";
 
         // Show the ProgressBar
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_police_id.php?police_id=" + id;
+        String checkIDUrl = "getString(R.string.server)+check_police_id.php?police_id=" + id;
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,

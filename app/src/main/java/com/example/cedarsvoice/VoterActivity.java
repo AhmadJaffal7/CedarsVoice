@@ -49,7 +49,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-public class VoterAct extends AppCompatActivity {
+public class VoterActivity extends AppCompatActivity {
     EditText editTextId;
     private TextView remainingTimeTextView;
     private CountDownTimer countDownTimer;
@@ -65,7 +65,7 @@ public class VoterAct extends AppCompatActivity {
 
         secretKey = getStoredSecretKey();
 
-        electionId = getIntent().getIntExtra("election_id",0);
+        electionId = getIntent().getIntExtra("electionID",0);
         remainingTimeTextView = findViewById(R.id.remainingTimeTextView);
         fetchEndTimeFromDatabase();
 
@@ -77,7 +77,7 @@ public class VoterAct extends AppCompatActivity {
     public void VoterLogin(View view) {
         String nid = editTextId.getText().toString().trim();
         if (!nid.isEmpty()) {
-            String url = "http://10.0.2.2/cedarsvoice/check_id.php?id=" + nid;
+            String url = getString(R.string.server)+"check_id.php?id=" + nid;
             RequestQueue queue = Volley.newRequestQueue(this);
             StringRequest request = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
@@ -89,7 +89,7 @@ public class VoterAct extends AppCompatActivity {
                                 if (idExists) {
                                     AuthenticateFingerprint(Integer.parseInt(nid));
                                 } else {
-                                    Toast.makeText(VoterAct.this, "ID doesn't exist in the database", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(VoterActivity.this, "ID doesn't exist in the database", Toast.LENGTH_SHORT).show();
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -99,7 +99,7 @@ public class VoterAct extends AppCompatActivity {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Toast.makeText(VoterAct.this, "Error occurred " + error.toString(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(VoterActivity.this, "Error occurred " + error.toString(), Toast.LENGTH_SHORT).show();
                         }
                     }) {
                 @Override
@@ -111,7 +111,7 @@ public class VoterAct extends AppCompatActivity {
             };
             queue.add(request);
         } else {
-            Toast.makeText(VoterAct.this, "Fingerprint doesn't match or ID is empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(VoterActivity.this, "Fingerprint doesn't match or ID is empty", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -199,7 +199,7 @@ public class VoterAct extends AppCompatActivity {
                                     runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            Toast.makeText(VoterAct.this, "Error fetching fingerprint: " + error, Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(VoterActivity.this, "Error fetching fingerprint: " + error, Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 }
@@ -208,7 +208,7 @@ public class VoterAct extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(VoterAct.this, "Error capturing fingerprint: CryptoObject or Cipher is null", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(VoterActivity.this, "Error capturing fingerprint: CryptoObject or Cipher is null", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
@@ -216,7 +216,7 @@ public class VoterAct extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText(VoterAct.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(VoterActivity.this, "Error capturing fingerprint: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             }
                         });
                         Log.e("FingerprintCapture", "Error: ", e);
@@ -229,7 +229,7 @@ public class VoterAct extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(VoterAct.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(VoterActivity.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
                         }
                     });
                     Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
@@ -252,7 +252,7 @@ public class VoterAct extends AppCompatActivity {
     }
 
     private void fetchFingerprintFromDatabase(int voterId, FingerprintCallback callback) {
-        String url = "http://10.0.2.2/cedarsvoice/retrieve_fingerprint.php?voter_id=" + voterId;
+        String url = getString(R.string.server)+"retrieve_fingerprint.php?voter_id=" + voterId;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -384,12 +384,12 @@ public class VoterAct extends AppCompatActivity {
     private void proceedWithLogin(String nid) {
         try{
             Log.d("Login", "Login method called");
-            Intent intent = new Intent(VoterAct.this, VotingAct.class);
+            Intent intent = new Intent(VoterActivity.this, VotingActivity.class);
             intent.putExtra("message", "Hello from VoterActivity!");
             intent.putExtra("voter_id", nid);
             intent.putExtra("election_id", electionId);
             startActivity(intent);
-            Toast.makeText(VoterAct.this, "Logged in Successfully.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(VoterActivity.this, "Logged in Successfully.", Toast.LENGTH_SHORT).show();
         }catch (Exception e) {
             // Log the exception
             Log.e("VoterAct", "Error during login", e);
@@ -410,7 +410,7 @@ public class VoterAct extends AppCompatActivity {
     }
 
     private void fetchEndTimeFromDatabase() {
-        String url = "http://10.0.2.2/cedarsvoice/get_end_time.php?electionId=" + electionId; // Replace with your server URL
+        String url = getString(R.string.server)+"get_end_time.php?electionId=" + electionId; // Replace with your server URL
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -523,7 +523,7 @@ public class VoterAct extends AppCompatActivity {
                 @Override
                 public void onFinish() {
                     // Close VoterActivity and open SupervisorActivity
-                    Intent intent = new Intent(VoterAct.this, SupervisorActivity.class);
+                    Intent intent = new Intent(VoterActivity.this, SupervisorActivity.class);
                     startActivity(intent);
                     finish(); // Close current activity
                 }
@@ -603,7 +603,7 @@ public class VoterAct extends AppCompatActivity {
                     int delayMinutes = Integer.parseInt(delayMinutesStr);
                     updateEndTime(delayMinutes);
                 } else {
-                    Toast.makeText(VoterAct.this, "Delay minutes cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VoterActivity.this, "Delay minutes cannot be empty", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -636,19 +636,19 @@ public class VoterAct extends AppCompatActivity {
                 throw new RuntimeException(e);
             }
         } else {
-            Toast.makeText(VoterAct.this, "Current end time is not set", Toast.LENGTH_SHORT).show();
+            Toast.makeText(VoterActivity.this, "Current end time is not set", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void updateEndTimeInDatabase(final String newEndTime) {
-        String url = "http://10.0.2.2/cedarsvoice/update_end_time.php";
+        String url = getString(R.string.server)+"update_end_time.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         // Handle the server's response
                         Log.d("VoterAct", "Update End Time Response: " + response);
-                        Toast.makeText(VoterAct.this, "End time updated successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(VoterActivity.this, "End time updated successfully", Toast.LENGTH_SHORT).show();
                         // Update the end time in the UI
                         current_endTime = newEndTime;
                         calculateRemainingTime(newEndTime);
@@ -663,7 +663,7 @@ public class VoterAct extends AppCompatActivity {
                         // Handle the error
                         Log.e("VoterAct", "Error updating end time: " + error.getMessage());
                         // Optionally, you can handle the error if needed
-                        Toast.makeText(VoterAct.this, "Failed to update end time", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(VoterActivity.this, "Failed to update end time", Toast.LENGTH_SHORT).show();
                     }
                 }) {
             @Override

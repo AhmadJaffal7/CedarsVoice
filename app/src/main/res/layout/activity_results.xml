@@ -4,36 +4,44 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ResultsActivity"
     android:orientation="vertical">
 
+    <!-- Results Table -->
     <TableLayout
         android:id="@+id/resultsTable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="*"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:background="@drawable/table_background"
+        android:stretchColumns="*">
 
+        <!-- Table Header Row -->
         <TableRow>
+            <!-- Candidate Column -->
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Candidate"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:padding="8dp"
                 android:gravity="center"
+                android:textColor="#00803a" />
 
-                android:textColor="@android:color/black" />
-
+            <!-- Votes Column -->
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Votes"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:padding="8dp"
                 android:gravity="center"
-
-                android:textColor="@android:color/black" />
+                android:textColor="#00803a" />
         </TableRow>
     </TableLayout>
+
 </LinearLayout>

@@ -40,7 +40,7 @@ public class AdminLoginActivity extends AppCompatActivity {
 
         // Validate user input
         if (!adminName.isEmpty() && !password.isEmpty()) {
-            String url = "http://10.0.2.2/cedarsvoice/admin_login.php";
+            String url = getString(R.string.server)+"admin_login.php";
             RequestQueue queue = Volley.newRequestQueue(this);
 
             // Show the ProgressBar

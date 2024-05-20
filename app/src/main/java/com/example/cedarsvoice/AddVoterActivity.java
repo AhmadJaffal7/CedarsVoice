@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.biometric.BiometricPrompt;
 import androidx.biometric.BiometricManager;
 
@@ -69,6 +70,23 @@ public class AddVoterActivity extends AppCompatActivity {
         editTextNationalID = findViewById(R.id.editTextNationalID);
 
         executor = Executors.newSingleThreadExecutor();
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Disable title
+        getSupportActionBar().setTitle("");
+
+        // Set navigation icon click listener
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate back to the Admin Activity
+                Intent intent = new Intent(AddVoterActivity.this, AdminActivity.class);
+                startActivity(intent);
+                finish(); // Optional: close current activity
+            }
+        });
     }
 
     public void addFingerprint(View view) {
@@ -129,7 +147,7 @@ public class AddVoterActivity extends AppCompatActivity {
         SecureRandom random = new SecureRandom();
         random.nextBytes(iv);
 
-        String checkIDUrl = "http://10.0.2.2/cedarsvoice/check_voter_id.php?national_id=" + nationalID;
+        String checkIDUrl = getString(R.string.server)+"check_voter_id.php?national_id=" + nationalID;
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,
@@ -147,7 +165,7 @@ public class AddVoterActivity extends AppCompatActivity {
                                     .setIcon(android.R.drawable.ic_dialog_alert)
                                     .show();
                         } else {
-                            String url = "http://10.0.2.2/cedarsvoice/add_voter.php";
+                            String url = getString(R.string.server)+"add_voter.php";
                             RequestQueue queue = Volley.newRequestQueue(AddVoterActivity.this);
                             ExecutorService executorService = Executors.newSingleThreadExecutor();
                             executorService.submit(new Runnable() {

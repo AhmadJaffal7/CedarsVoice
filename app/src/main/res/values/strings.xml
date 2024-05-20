@@ -11,4 +11,5 @@
     <string name="add_police">Add Police</string>
     <string name="add_fingerprint">Add Fingerprint</string>
     <string name="Key">AJ7JK70123456789</string>
+    <string name="server">http://10.0.2.2/cedarsvoice/</string>
 </resources>

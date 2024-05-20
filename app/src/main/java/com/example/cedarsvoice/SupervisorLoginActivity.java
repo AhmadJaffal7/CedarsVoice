@@ -27,6 +27,8 @@ import java.util.Map;
 public class SupervisorLoginActivity extends AppCompatActivity {
     private EditText editTextSupervisorID;
     private EditText editTextPoliceID;
+    ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +36,7 @@ public class SupervisorLoginActivity extends AppCompatActivity {
 
         editTextSupervisorID = findViewById(R.id.editTextSupervisorID);
         editTextPoliceID = findViewById(R.id.editTextPoliceID);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     public void verifyLogin(View view) {
@@ -45,7 +48,7 @@ public class SupervisorLoginActivity extends AppCompatActivity {
             RequestQueue queue = Volley.newRequestQueue(this);
 
             // URL of your backend endpoint to verify IDs
-            String url = "http://10.0.2.2/cedarsvoice/supervisor_login.php";
+            String url = getString(R.string.server)+"supervisor_login.php";
 
             // Get the ProgressBar and make it visible
             ProgressBar progressBar = findViewById(R.id.progressBar);
@@ -61,6 +64,7 @@ public class SupervisorLoginActivity extends AppCompatActivity {
                             if (response.equals("success")) {
                                 // Police ID and Supervisor ID verified successfully
                                 Intent intent = new Intent(SupervisorLoginActivity.this, SupervisorActivity.class);
+                                intent.putExtra("supervisorID", Integer.parseInt(supervisorID));
                                 startActivity(intent);
                                 Toast.makeText(SupervisorLoginActivity.this, "Logged in as Supervisor", Toast.LENGTH_SHORT).show();
                             } else {

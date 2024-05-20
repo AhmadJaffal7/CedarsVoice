@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -15,10 +17,23 @@ public class AdminActivity extends AppCompatActivity {
         setContentView(R.layout.activity_admin);
 
         // Initialize buttons
-        Button btnAddCandidate = findViewById(R.id.btnAddCandidate);
-        Button btnAddSupervisor = findViewById(R.id.btnAddSupervisor);
-        Button btnAddVoter = findViewById(R.id.btnAddVoter);
-        Button btnAddPolice = findViewById(R.id.btnAddPolice);
+        LinearLayout btnAddCandidate = findViewById(R.id.llAddCandidate);
+        LinearLayout btnAddSupervisor = findViewById(R.id.llAddSupervisor);
+        LinearLayout btnAddVoter = findViewById(R.id.llAddVoter);
+        LinearLayout btnAddPolice = findViewById(R.id.llAddPolice);
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Set navigation icon click listener
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate back to the Admin Activity
+                Intent intent = new Intent(AdminActivity.this, AdminLoginActivity.class);
+                startActivity(intent);
+                finish(); // Optional: close current activity
+            }
+        });
 
         // Set onClickListeners
         btnAddCandidate.setOnClickListener(new View.OnClickListener() {

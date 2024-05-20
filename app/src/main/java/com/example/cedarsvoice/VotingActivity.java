@@ -41,7 +41,7 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-public class VotingAct extends AppCompatActivity {
+public class VotingActivity extends AppCompatActivity {
     private TextView remainingTimeTextView;
     private String endTime;
     private CountDownTimer countDownTimer;
@@ -70,7 +70,7 @@ public class VotingAct extends AppCompatActivity {
     }
 
     private void fetchCandidateNames() {
-        String url = "http://10.0.2.2/cedarsvoice/get_candidate_names.php";
+        String url = getString(R.string.server)+"get_candidate_names.php";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -88,7 +88,7 @@ public class VotingAct extends AppCompatActivity {
                                 candidateNames.add(candidateName);
                                 candidateNameToIdMap.put(candidateName, candidateId);
                             }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(VotingAct.this, android.R.layout.simple_spinner_item, candidateNames);
+                            ArrayAdapter<String> adapter = new ArrayAdapter<>(VotingActivity.this, android.R.layout.simple_spinner_item, candidateNames);
                             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             spinnerCandidates.setAdapter(adapter);
                         } catch (JSONException e) {
@@ -98,7 +98,7 @@ public class VotingAct extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(VotingActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -107,7 +107,7 @@ public class VotingAct extends AppCompatActivity {
 
     public void VoterVote(View view) {
         // Create an AlertDialog.Builder object
-        AlertDialog.Builder builder = new AlertDialog.Builder(VotingAct.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(VotingActivity.this);
         builder.setTitle("Confirmation")
                 .setMessage("Are you sure you want to vote?")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -139,7 +139,7 @@ public class VotingAct extends AppCompatActivity {
         String selectedCandidateId = candidateNameToIdMap.get(selectedCandidateName);
         int candidate_id = Integer.parseInt(selectedCandidateId);
         RequestQueue queue = Volley.newRequestQueue(this);
-        StringRequest getRequest = new StringRequest(Request.Method.GET, "http://10.0.2.2/cedarsvoice/get_vote_count.php?candidate_id=" + candidate_id,
+        StringRequest getRequest = new StringRequest(Request.Method.GET, getString(R.string.server)+"get_vote_count.php?candidate_id=" + candidate_id,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -148,7 +148,7 @@ public class VotingAct extends AppCompatActivity {
                             int currentVoteCount = decryptVoteCount(response);
                             // Check if decryption was successful
                             if (currentVoteCount == -1) {
-                                Toast.makeText(VotingAct.this, "Error decrypting vote count", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(VotingActivity.this, "Error decrypting vote count", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                             // Increment the count by 1
@@ -157,7 +157,7 @@ public class VotingAct extends AppCompatActivity {
                             String encryptedNewVoteCount = encryptVoteCount(newVoteCount);
                             // Check if encryption was successful
                             if (encryptedNewVoteCount == null) {
-                                Toast.makeText(VotingAct.this, "Error encrypting vote count", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(VotingActivity.this, "Error encrypting vote count", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                             // Update the encrypted count in the database
@@ -227,13 +227,13 @@ public class VotingAct extends AppCompatActivity {
 
     private void updateVoteCountInDatabase(String newVoteCount, int candidateId) {
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "http://10.0.2.2/cedarsvoice/update_vote_count.php";
+        String url = getString(R.string.server)+"update_vote_count.php";
 
         StringRequest updateRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Toast.makeText(VotingAct.this, response, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(VotingActivity.this, response, Toast.LENGTH_SHORT).show();
                         updateHasVotedField();
                     }
                 }, new Response.ErrorListener() {
@@ -257,7 +257,7 @@ public class VotingAct extends AppCompatActivity {
     }
 
     private void updateHasVotedField() {
-        String url = "http://10.0.2.2/cedarsvoice/update_has_voted.php";
+        String url = getString(R.string.server)+"update_has_voted.php";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -270,7 +270,7 @@ public class VotingAct extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(VotingAct.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(VotingActivity.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }) {
             @Override
@@ -286,7 +286,7 @@ public class VotingAct extends AppCompatActivity {
 
     public void logout() {
         // Create an intent to start VoterAct
-        Intent intent = new Intent(VotingAct.this, VoterAct.class);
+        Intent intent = new Intent(VotingActivity.this, VoterActivity.class);
         intent.putExtra("endTime", endTime);
         startActivity(intent);
 
@@ -295,7 +295,7 @@ public class VotingAct extends AppCompatActivity {
     }
 
     private void fetchEndTimeFromDatabase() {
-        String url = "http://10.0.2.2/cedarsvoice/get_end_time.php?electionId=" + electionId; // Replace with your server URL
+        String url = getString(R.string.server)+"get_end_time.php?electionId=" + electionId; // Replace with your server URL
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {

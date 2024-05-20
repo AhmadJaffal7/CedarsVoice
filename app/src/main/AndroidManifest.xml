@@ -21,23 +21,29 @@
             android:name=".ResultsActivity"
             android:exported="false" />
         <activity
-            android:name=".VotingAct"
+            android:name=".VotingActivity"
             android:exported="false" />
         <activity
-            android:name=".VoterAct"
+            android:name=".VoterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".MainActivity"/>
+<!--            android:exported="true">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
+        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
+        <activity android:name=".SupervisorLoginActivity" /><!-- Declaration for SupervisorLoginActivity -->
+        <activity android:name=".AdminActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
-        <activity android:name=".SupervisorLoginActivity" /> <!-- Declaration for SupervisorLoginActivity -->
-        <activity android:name=".AdminActivity" /> <!-- Declaration for AdminActivity -->
+        </activity> <!-- Declaration for AdminActivity -->
         <activity android:name=".AddVoterActivity" /> <!-- Declaration for AddVoterActivity -->
         <activity android:name=".AddCandidateActivity" /> <!-- Declaration for AddCandidateActivity -->
         <activity android:name=".AddSupervisorActivity" /> <!-- Declaration for AddSupervisorActivity -->

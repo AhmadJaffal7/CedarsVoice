@@ -1,59 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:padding="16dp"
-    android:background="#FFFFFF"
-    >
-    <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/cedars" />
+    android:background="@color/background_color"
+    android:padding="16dp">
 
-    <EditText
-        android:id="@+id/editTextID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Admin ID"
-        android:padding="12dp"
-        android:layout_marginBottom="8dp" />
-
-    <EditText
-        android:id="@+id/editTextPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:layout_marginBottom="8dp" />
-
-    <Button
-        android:id="@+id/admin_login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Login"
-        android:onClick="login"
-        android:textSize="18dp"
-        android:padding="5dp"
-        android:textColor="#FFFFFF"
-        android:background="@drawable/buttons_bg"
-        />
-
-    <!-- Add ProgressBar to Show Progress -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         android:gravity="center">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
+        <ImageView
             android:layout_width="wrap_content"
+            android:layout_height="250dp"
+            android:layout_marginTop="-70dp"
+            android:layout_marginBottom="20dp"
+            android:src="@drawable/cedars" />
+
+        <EditText
+            android:id="@+id/editTextID"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Admin ID"
+            android:padding="12dp"
+            android:textColorHint="@color/hint_text_color" />
+
+        <EditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:padding="12dp"
+            android:textColorHint="@color/hint_text_color" />
+
+        <Button
+            android:id="@+id/admin_login_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="login"
+            android:padding="16dp"
+            android:text="Login"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Add ProgressBar to Show Progress -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

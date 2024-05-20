@@ -1,77 +1,115 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".AddVoterActivity"
-    android:background="#FFFFFF"
-    >
-    <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/cedars" />
+    android:layout_height="match_parent">
 
-    <EditText
-        android:id="@+id/editTextSupervisorID"
+    <!-- App Bar with Back Button and Text View -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Supervisor ID"
-        android:inputType="number"
-        android:textColor="#00803a"
-        />
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <EditText
-        android:id="@+id/editTextSupervisorName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name"
-        android:textColor="#00803a"
-        />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00803a"
+            app:navigationIcon="@drawable/ic_back"
+            app:titleTextColor="#FFFFFF">
 
-    <Spinner
-        android:id="@+id/spinnerPoliceID"
-        android:layout_width="match_parent"
-        android:layout_height="48dp" />
+            <!-- TextView in the App Bar -->
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Add Supervisor"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
+        </androidx.appcompat.widget.Toolbar>
 
-    <Button
-        android:id="@+id/btnAddFingerprint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Fingerprint"
-        android:onClick="addFingerprint"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        />
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <!-- Add Button to Add Voter -->
-    <Button
-        android:id="@+id/buttonAddSupervisor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Supervisor"
-        android:onClick="addSupervisor"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-
-        />
-
-    <!-- Add ProgressBar to Show Progress -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
+        <!-- Image Header -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="32dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cedars" />
+
+        <!-- Supervisor ID EditText -->
+        <EditText
+            android:id="@+id/editTextSupervisorID"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Enter Supervisor ID"
+            android:inputType="number"
+            android:padding="12dp"
+            android:textColor="@color/text_color" />
+
+        <!-- Supervisor Name EditText -->
+        <EditText
+            android:id="@+id/editTextSupervisorName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Enter Name"
+            android:padding="12dp"
+            android:textColor="@color/text_color" />
+
+        <!-- Spinner for Police ID -->
+        <Spinner
+            android:id="@+id/spinnerPoliceID"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/spinner_bg" />
+
+        <!-- Add Fingerprint Button -->
+        <Button
+            android:id="@+id/btnAddFingerprint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="addFingerprint"
+            android:padding="16dp"
+            android:text="Add Fingerprint"
+            android:textColor="@color/white" />
+
+        <!-- Add Supervisor Button -->
+        <Button
+            android:id="@+id/buttonAddSupervisor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="addSupervisor"
+            android:padding="16dp"
+            android:text="Add Supervisor"
+            android:textColor="@color/white" />
+
     </LinearLayout>
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

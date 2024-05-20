@@ -1,5 +1,6 @@
 package com.example.cedarsvoice;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkError;
@@ -29,7 +31,7 @@ import java.util.concurrent.Executors;
 
 public class AddCandidateActivity extends AppCompatActivity {
 
-    private EditText editTextName, editTextLastName, editTextAge, editTextDescription;
+    private EditText editTextName, editTextLastName, editTextAge;
     private RequestQueue requestQueue;
 
     @Override
@@ -40,19 +42,33 @@ public class AddCandidateActivity extends AppCompatActivity {
         editTextName = findViewById(R.id.editTextName);
         editTextLastName = findViewById(R.id.editTextLastName);
         editTextAge = findViewById(R.id.editTextAge);
-        editTextDescription = findViewById(R.id.editTextDescription);
 
         requestQueue = Volley.newRequestQueue(this);
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Disable title
+        getSupportActionBar().setTitle("");
+
+        // Set navigation icon click listener
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Navigate back to the Admin Activity
+                Intent intent = new Intent(AddCandidateActivity.this, AdminActivity.class);
+                startActivity(intent);
+                finish(); // Optional: close current activity
+            }
+        });
     }
 
     public void addCandidate(View view) {
         final String name = editTextName.getText().toString();
         final String lastName = editTextLastName.getText().toString();
         final String ageString = editTextAge.getText().toString();
-        final String description = editTextDescription.getText().toString();
 
-        if (name.isEmpty() || lastName.isEmpty() || ageString.isEmpty() || description.isEmpty()) {
+        if (name.isEmpty() || lastName.isEmpty() || ageString.isEmpty()) {
             Toast.makeText(AddCandidateActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -74,7 +90,7 @@ public class AddCandidateActivity extends AppCompatActivity {
             return;
         }
 
-        String url = "http://10.0.2.2/cedarsvoice/add_candidate.php";
+        String url = getString(R.string.server)+"add_candidate.php";
         // Show the ProgressBar
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
@@ -91,7 +107,6 @@ public class AddCandidateActivity extends AppCompatActivity {
                                 editTextName.setText("");
                                 editTextLastName.setText("");
                                 editTextAge.setText("");
-                                editTextDescription.setText("");
                                 progressBar.setVisibility(View.GONE);
                             }
                         }, new Response.ErrorListener() {
@@ -118,7 +133,6 @@ public class AddCandidateActivity extends AppCompatActivity {
                         params.put("first_name", name);
                         params.put("last_name", lastName);
                         params.put("age", ageString);
-                        params.put("description", description);
                         return params;
                     }
                 };

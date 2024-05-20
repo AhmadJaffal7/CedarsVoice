@@ -1,72 +1,111 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".AddVoterActivity"
-
     android:background="#FFFFFF"
-    >
-    <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/cedars" />
+    tools:context=".AddPoliceActivity">
 
-    <EditText
-        android:id="@+id/editTextPoliceID"
+    <!-- App Bar with Back Button and Text View -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Police ID"
-        android:inputType="number"
-        android:textColor="#00803a"
-        />
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:elevation="4dp">
 
-    <EditText
-        android:id="@+id/editTextPoliceName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Name"
-        android:textColor="#00803a"
-        />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00803a"
+            app:titleTextColor="#FFFFFF"
+            app:navigationIcon="@drawable/ic_back">
 
-    <!-- Add Button to Add Fingerprint -->
-    <Button
-        android:id="@+id/btnAddFingerprint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/add_fingerprint"
-        android:onClick="addFingerprint"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="10dp"
-        />
+            <!-- TextView in the App Bar -->
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add Police"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:layout_gravity="center"/>
 
-    <!-- Add Button to Add Voter -->
-    <Button
-        android:id="@+id/buttonAddPolice"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/add_police"
-        android:onClick="addPolice"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="10dp"
-        />
+        </androidx.appcompat.widget.Toolbar>
 
-    <!-- Add ProgressBar to Show Progress -->
+    </com.google.android.material.appbar.AppBarLayout>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="30dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cedars" />
+
+        <!-- Police ID EditText -->
+        <EditText
+            android:id="@+id/editTextPoliceID"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"/>
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Police ID"
+            android:inputType="number"
+            android:padding="12dp"
+            android:textColor="#00803a" />
+
+        <!-- Name EditText -->
+        <EditText
+            android:id="@+id/editTextPoliceName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Name"
+            android:padding="12dp"
+            android:textColor="#00803a" />
+
+        <!-- Add Fingerprint Button -->
+        <Button
+            android:id="@+id/btnAddFingerprint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/buttons_bg"
+            android:padding="12dp"
+            android:text="@string/add_fingerprint"
+            android:textColor="#FFFFFF"
+            android:onClick="addFingerprint"/>
+
+        <!-- Add Police Button -->
+        <Button
+            android:id="@+id/buttonAddPolice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/buttons_bg"
+            android:padding="12dp"
+            android:text="@string/add_police"
+            android:textColor="#FFFFFF"
+            android:onClick="addPolice"/>
+
     </LinearLayout>
 
-</LinearLayout>
+    <!-- ProgressBar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

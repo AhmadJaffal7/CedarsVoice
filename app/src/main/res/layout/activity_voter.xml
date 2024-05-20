@@ -1,92 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".VoterAct">
+    android:background="@color/background_color">
 
-    <LinearLayout
+    <!-- App bar layout -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
+        android:layout_height="?attr/actionBarSize"
+        android:background="#00803a">
         <ImageView
             android:id="@+id/clockIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_clock"
             android:contentDescription="Clock Icon"
+            android:layout_gravity="start"
             android:layout_marginEnd="6dp" />
 
         <TextView
             android:id="@+id/remainingTimeTextView"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Remaining Time"
-            android:textColor="#00803a"
+            android:textColor="@color/black"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <Button
             android:id="@+id/delayButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:text="Delay"
             android:textSize="15sp"
             android:textColor="#FFFFFF"
-            android:background="@drawable/buttons_bg"
+            android:background="@android:color/transparent"
             android:paddingHorizontal="20dp"
-            android:onClick="DelayTime" />
+            android:onClick="DelayTime"
+            android:layout_gravity="end" />
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Main content layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="16dp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/cedars" />
+
+        <EditText
+            android:id="@+id/Nid"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="National Id"
+            android:textColor="@color/text_color"
+            android:textSize="18sp"
+            android:padding="12dp"
+            android:background="@drawable/edit_text_bg" />
+
+        <Button
+            android:id="@+id/butLogin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="VoterLogin"
+            android:padding="15dp"
+            android:text="Login"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp" />
 
     </LinearLayout>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Voter Login"
-        android:textColor="#00803a"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        android:gravity="center" />
-
-    <EditText
-        android:id="@+id/Nid"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="National Id"
-        android:textColor="#00803a"
-        android:textSize="18sp"
-        android:padding="12dp"
-        android:background="@drawable/edit_text_bg" />
-
-    <Button
-        android:id="@+id/butLogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/buttons_bg"
-        android:onClick="VoterLogin"
-        android:padding="15dp"
-        android:text="Login"
-        android:textColor="#FFFFFF"
-        android:textSize="18sp" />
-
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="16dp"
-        android:adjustViewBounds="true"
-        android:scaleType="centerInside"
-        android:src="@drawable/cedars" />
-
-</LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

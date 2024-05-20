@@ -1,83 +1,120 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    tools:context=".AddVoterActivity"
-    android:background="#FFFFFF"
-    >
+    android:background="@color/white"
+    tools:context=".AddVoterActivity">
 
-    <EditText
-        android:id="@+id/editTextFirstName"
+    <!-- App Bar with Back Button and Text View -->
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="First Name"
-        android:textColor="#00803a"
-        />
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <EditText
-        android:id="@+id/editTextLastName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Last Name"
-        android:textColor="#00803a"
-        />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00803a"
+            app:navigationIcon="@drawable/ic_back"
+            app:titleTextColor="#FFFFFF">
 
-    <EditText
-        android:id="@+id/editTextNationalID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="National ID"
-        android:textColor="#00803a"
-        />
+            <!-- TextView in the App Bar -->
+            <TextView
+                android:id="@+id/textViewTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Add Supervisor"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp"
+                android:textStyle="bold" />
 
-    <!-- Add Button to Add Fingerprint -->
-    <Button
-        android:id="@+id/btnAddFingerprint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Fingerprint"
-        android:onClick="addFingerprint"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"
-        />
+        </androidx.appcompat.widget.Toolbar>
 
-    <!-- Add Button to Add Voter -->
-    <Button
-        android:id="@+id/buttonAddVoter"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add Voter"
-        android:onClick="addVoter"
-        android:layout_marginTop="15dp"
-        android:background="@drawable/buttons_bg"
-        android:textColor="#FFFFFF"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
-    <ImageView
-        android:layout_width="335dp"
-        android:layout_height="166dp"
-        android:layout_marginBottom="40dp"
-        android:layout_marginTop="50dp"
-        android:layout_marginLeft="25dp"
 
-        android:src="@drawable/cedars" />
-
-    <!-- Add ProgressBar to Show Progress -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
+        <!-- Cedars Image -->
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="25dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/cedars" />
+
+        <!-- First Name EditText -->
+        <EditText
+            android:id="@+id/editTextFirstName"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
-            android:visibility="gone"/>
+            android:layout_marginTop="24dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="First Name"
+            android:textColor="#00803a"
+            android:textColorHint="#00803a" />
 
+        <!-- Last Name EditText -->
+        <EditText
+            android:id="@+id/editTextLastName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="Last Name"
+            android:textColor="#00803a"
+            android:textColorHint="#00803a" />
 
+        <!-- National ID EditText -->
+        <EditText
+            android:id="@+id/editTextNationalID"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/edit_text_bg"
+            android:hint="National ID"
+            android:textColor="#00803a"
+            android:textColorHint="#00803a" />
+
+        <!-- Add Fingerprint Button -->
+        <Button
+            android:id="@+id/btnAddFingerprint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="addFingerprint"
+            android:text="Add Fingerprint"
+            android:textColor="#FFFFFF" />
+
+        <!-- Add Voter Button -->
+        <Button
+            android:id="@+id/buttonAddVoter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="addVoter"
+            android:text="Add Voter"
+            android:textColor="#FFFFFF" />
 
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

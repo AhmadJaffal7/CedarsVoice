@@ -43,7 +43,7 @@ public class ResultsActivity extends AppCompatActivity {
     }
 
     private void fetchResults() {
-        String url = "http://10.0.2.2/cedarsvoice/get_results.php";
+        String url = getString(R.string.server)+"get_results.php";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override

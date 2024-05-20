@@ -6,12 +6,14 @@ try {
 
     $start_time = $_POST['start_time'];
     $end_time = $_POST['end_time'];
+    $supervisor_id = $_POST['supervisor_id']; // Assuming you receive supervisor ID as a string
 
-    // Insert start and end times into the database
-    $query = "INSERT INTO elections (start_time, end_time) VALUES (?, ?)";
+    // Insert start and end times along with supervisor_id into the database
+    $query = "INSERT INTO elections (start_time, end_time, supervisor_id) VALUES (?, ?, ?)";
     $stmt = $pdo->prepare($query);
     $stmt->bindValue(1, $start_time, PDO::PARAM_STR);
     $stmt->bindValue(2, $end_time, PDO::PARAM_STR);
+    $stmt->bindValue(3, $supervisor_id, PDO::PARAM_INT); // Assuming supervisor_id is an integer
     $stmt->execute();
 
     // Get the ID of the newly inserted record

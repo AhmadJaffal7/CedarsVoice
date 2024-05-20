@@ -1,11 +1,13 @@
 package com.example.cedarsvoice;
 
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,11 +35,9 @@ import java.util.concurrent.TimeUnit;
 
 public class SupervisorActivity extends AppCompatActivity {
 
-    private TextView startTimeLabel, endTimeLabel;
     private String startTimeString, endTimeString; // Variable to store the end time
     private EditText startTimeEditText, endTimeEditText;
-    private Button butStart, butStartElection;
-    private int election_id = 0;
+    private int election_id = 0, supervisor_id;
 
 
     @Override
@@ -45,12 +45,10 @@ public class SupervisorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_supervisor);
 
-        startTimeLabel = findViewById(R.id.startTimeLabel);
-        endTimeLabel = findViewById(R.id.endTimeLabel);
         startTimeEditText = findViewById(R.id.startTimeEditText);
         endTimeEditText = findViewById(R.id.endTimeEditText);
-        butStart = findViewById(R.id.butStart);
-        butStartElection = findViewById(R.id.butStartElection);
+        supervisor_id = getIntent().getIntExtra("supervisorID", 0);
+        Log.d("SupervisorActivity", "Supervisor ID: " + supervisor_id);
     }
 
     public void showStartTimePicker(View view) {
@@ -100,15 +98,6 @@ public class SupervisorActivity extends AppCompatActivity {
             Log.e("SupervisorActivity", "Error showing end time picker", e);
             Toast.makeText(this, "Error showing end time picker. Please try again.", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public void startElection(View view) {
-        startTimeLabel.setVisibility(View.VISIBLE);
-        endTimeLabel.setVisibility(View.VISIBLE);
-        startTimeEditText.setVisibility(View.VISIBLE);
-        endTimeEditText.setVisibility(View.VISIBLE);
-        butStart.setVisibility(View.VISIBLE);
-        butStartElection.setVisibility(View.GONE);
     }
 
     public void saveTimes(View view) {
@@ -169,12 +158,6 @@ public class SupervisorActivity extends AppCompatActivity {
 
                 public void onFinish() {
                     dialog.dismiss();
-                    // If current time is after the start time, open the VoterActivity
-//                    Intent intent = new Intent(SupervisorActivity.this, VoterAct.class);
-//                    Log.e("SupervisorActivity", "Election ID: " + election_id);
-//                    intent.putExtra("election_id", election_id);
-//                    startActivity(intent);
-//                    finish(); // Close current activity
                 }
             }.start();
         } catch (Exception e) {
@@ -192,7 +175,7 @@ public class SupervisorActivity extends AppCompatActivity {
         final String endTimeString = dateFormat.format(endTime);
 
         // URL of the server-side script that will handle the time data
-        String url = "http://10.0.2.2/cedarsvoice/save_time.php";
+        String url = getString(R.string.server)+"save_time.php";
 
         RequestQueue queue = Volley.newRequestQueue(SupervisorActivity.this);
         // Create a StringRequest object
@@ -206,9 +189,8 @@ public class SupervisorActivity extends AppCompatActivity {
                             // Assuming the server returns the ID of the newly inserted record
                             election_id = Integer.parseInt(response.trim());
                             Log.d("SaveTimes", "New record ID: " + election_id);
-                            // Open the VoterActivity and pass the new record ID
-                            Intent intent = new Intent(SupervisorActivity.this, VoterAct.class);
-                            intent.putExtra("election_id", election_id);
+                            Intent intent = new Intent(SupervisorActivity.this, VoterActivity.class);
+                            intent.putExtra("electionID", election_id);
                             startActivity(intent);
                         } catch (NumberFormatException e) {
                             Log.e("SaveTimes", "Error parsing server response", e);
@@ -229,11 +211,37 @@ public class SupervisorActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<>();
                 params.put("start_time", startTimeString);
                 params.put("end_time", endTimeString);
+                params.put("supervisor_id", String.valueOf(supervisor_id));
                 return params;
             }
         };
 
         // Add the request to the Volley request queue
         queue.add(stringRequest);
+    }
+
+    private void showCountdownTimer(long remainingTimeMillis, final Date startTime, final Date endTime) {
+        // Display a dialog showing remaining time to start
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Time to Start");
+
+        final TextView countdownTextView = new TextView(this);
+        builder.setView(countdownTextView);
+
+        final AlertDialog dialog = builder.create();
+        dialog.setCancelable(false); // Make the dialog unremovable
+        dialog.show();
+
+        new CountDownTimer(remainingTimeMillis, 1000) {
+            public void onTick(long millisUntilFinished) {
+                long remainingMinutes = TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished);
+                long remainingSeconds = TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) - TimeUnit.MINUTES.toSeconds(remainingMinutes);
+                countdownTextView.setText("The election will start in " + remainingMinutes + " minutes and " + remainingSeconds + " seconds.");
+            }
+            public void onFinish() {
+                dialog.dismiss();
+                saveTimesToDatabase(startTime, endTime);
+            }
+        }.start();
     }
 }
