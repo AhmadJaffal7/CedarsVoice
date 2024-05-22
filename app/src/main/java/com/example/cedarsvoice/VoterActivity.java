@@ -624,12 +624,15 @@ public class VoterActivity extends AppCompatActivity {
                 Date endTime = sdf.parse(current_endTime);
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(endTime);
-                calendar.add(Calendar.MINUTE, delayMinutes);
+                calendar.add(Calendar.MINUTE, delayMinutes); // Delay in minutes
+
                 String newEndTime = sdf.format(calendar.getTime());
 
                 // Now update the new end_time in the MySQL database
                 updateEndTimeInDatabase(newEndTime);
 
+                // Save the delay time in the database
+                saveDelayTimeToDatabase(delayMinutes);
             } catch (ParseException e) {
                 e.printStackTrace();
             } catch (java.text.ParseException e) {
@@ -670,6 +673,39 @@ public class VoterActivity extends AppCompatActivity {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
                 params.put("end_time", newEndTime);
+                params.put("electionId", String.valueOf(electionId));
+                return params;
+            }
+        };
+
+        // Add the request to the Volley request queue
+        RequestQueue queue = Volley.newRequestQueue(this);
+        queue.add(stringRequest);
+    }
+
+    private void saveDelayTimeToDatabase(final int delayMinutes) {
+        String url = getString(R.string.server) + "save_delay_time.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Handle the server's response
+                        Log.d("VoterAct", "Save Delay Time Response: " + response);
+                        Toast.makeText(VoterActivity.this, "Delay time saved successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle the error
+                        Log.e("VoterAct", "Error saving delay time: " + error.getMessage());
+                        Toast.makeText(VoterActivity.this, "Failed to save delay time", Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("delay_time", String.valueOf(delayMinutes));
                 params.put("electionId", String.valueOf(electionId));
                 return params;
             }

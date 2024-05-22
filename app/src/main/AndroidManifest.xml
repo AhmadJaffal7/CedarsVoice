@@ -18,37 +18,25 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ResultsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".VotingActivity"
-            android:exported="false" />
-        <activity
-            android:name=".VoterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"/>
-<!--            android:exported="true">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-<!--        </activity>-->
-        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
-        <activity android:name=".SupervisorLoginActivity" /><!-- Declaration for SupervisorLoginActivity -->
-        <activity android:name=".AdminActivity" android:exported="true">
+            android:name=".MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- Declaration for AdminActivity -->
+        </activity> <!-- Declaration for MainActivity -->
+        <activity android:name=".AdminLoginActivity" /> <!-- Declaration for AdminLoginActivity -->
+        <activity android:name=".SupervisorLoginActivity" /><!-- Declaration for SupervisorLoginActivity -->
+        <activity android:name=".AdminActivity" /> <!-- Declaration for AdminActivity -->
         <activity android:name=".AddVoterActivity" /> <!-- Declaration for AddVoterActivity -->
         <activity android:name=".AddCandidateActivity" /> <!-- Declaration for AddCandidateActivity -->
         <activity android:name=".AddSupervisorActivity" /> <!-- Declaration for AddSupervisorActivity -->
         <activity android:name=".AddPoliceActivity" /> <!-- Declaration for AddPoliceActivity -->
-        <activity android:name=".SupervisorActivity" />
+        <activity android:name=".SupervisorActivity" /> <!-- Declaration for SupervisorActivity -->
+        <activity android:name=".ResultsActivity"/> <!-- Declaration for ResultsActivity -->
+        <activity android:name=".VotingActivity"/> <!-- Declaration for VotingActivity -->
+        <activity android:name=".VoterActivity" /> <!-- Declaration for VoterActivity -->
     </application>
 
 </manifest>
