@@ -12,19 +12,19 @@
         // Set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // Prepare a SQL query to check if the voter ID exists in the votes table
-        $stmt = $conn->prepare("SELECT * FROM votes WHERE voter_id = ?");
+        // Prepare a SQL query to check if the voter has voted in the voters table
+        $stmt = $conn->prepare("SELECT has_voted FROM voters WHERE voter_id = ?");
         $stmt->execute([$voter_id]);
 
         // Get the result
-        $result = $stmt->fetchAll();
+        $result = $stmt->fetch();
 
-        // Check if the voter ID exists in the votes table
-        if (count($result) > 0) {
-            // The voter ID exists in the votes table
+        // Check if the voter has voted
+        if ($result['has_voted'] == 1) {
+            // The voter has voted
             echo json_encode(array("hasVoted" => true));
         } else {
-            // The voter ID does not exist in the votes table
+            // The voter has not voted
             echo json_encode(array("hasVoted" => false));
         }
     } catch(PDOException $e) {
