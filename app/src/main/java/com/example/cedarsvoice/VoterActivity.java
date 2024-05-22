@@ -77,7 +77,7 @@ public class VoterActivity extends AppCompatActivity {
     public void VoterLogin(View view) {
         String nid = editTextId.getText().toString().trim();
         if (!nid.isEmpty()) {
-            String url = getString(R.string.server)+"check_id.php?id=" + nid;
+            String url = getString(R.string.server) + "check_vote.php"; // replace with your server URL
             RequestQueue queue = Volley.newRequestQueue(this);
             StringRequest request = new StringRequest(Request.Method.POST, url,
                     new Response.Listener<String>() {
@@ -85,11 +85,44 @@ public class VoterActivity extends AppCompatActivity {
                         public void onResponse(String response) {
                             try {
                                 JSONObject jsonResponse = new JSONObject(response);
-                                boolean idExists = jsonResponse.getBoolean("exists");
-                                if (idExists) {
-                                    AuthenticateFingerprint(Integer.parseInt(nid));
+                                boolean hasVoted = jsonResponse.getBoolean("hasVoted");
+                                if (hasVoted) {
+                                    Toast.makeText(VoterActivity.this, "You have already voted", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(VoterActivity.this, "ID doesn't exist in the database", Toast.LENGTH_SHORT).show();
+                                    // Existing login process
+                                    String url = getString(R.string.server) + "check_id.php?id=" + nid;
+                                    RequestQueue queue = Volley.newRequestQueue(VoterActivity.this);
+                                    StringRequest request = new StringRequest(Request.Method.POST, url,
+                                            new Response.Listener<String>() {
+                                                @Override
+                                                public void onResponse(String response) {
+                                                    try {
+                                                        JSONObject jsonResponse = new JSONObject(response);
+                                                        boolean idExists = jsonResponse.getBoolean("exists");
+                                                        if (idExists) {
+                                                            AuthenticateFingerprint(Integer.parseInt(nid));
+                                                        } else {
+                                                            Toast.makeText(VoterActivity.this, "ID doesn't exist in the database", Toast.LENGTH_SHORT).show();
+                                                        }
+                                                    } catch (JSONException e) {
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            },
+                                            new Response.ErrorListener() {
+                                                @Override
+                                                public void onErrorResponse(VolleyError error) {
+                                                    Toast.makeText(VoterActivity.this, "Error occurred " + error.toString(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }) {
+                                        @Override
+                                        protected Map<String, String> getParams() {
+                                            Map<String, String> params = new HashMap<>();
+                                            params.put("id", nid);
+                                            return params;
+                                        }
+                                    };
+                                    queue.add(request);
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -114,7 +147,6 @@ public class VoterActivity extends AppCompatActivity {
             Toast.makeText(VoterActivity.this, "Fingerprint doesn't match or ID is empty", Toast.LENGTH_SHORT).show();
         }
     }
-
     public void AuthenticateFingerprint(int nid) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
