@@ -140,9 +140,6 @@ public class SupervisorActivity extends AppCompatActivity {
                     Toast.makeText(this, "Start time must be before end time.", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                // Save start and end times to the database
-                saveTimesToDatabase(startTimeCalendar.getTime(), endTime);
             }
 
         } catch (Exception e) {
@@ -170,12 +167,19 @@ public class SupervisorActivity extends AppCompatActivity {
                         // Handle the server's response
                         Log.d("SaveTimes", "Server Response: " + response);
                         try {
-                            // Assuming the server returns the ID of the newly inserted record
-                            election_id = Integer.parseInt(response.trim());
-                            Log.d("SaveTimes", "New record ID: " + election_id);
-                            Intent intent = new Intent(SupervisorActivity.this, VoterActivity.class);
-                            intent.putExtra("electionID", election_id);
-                            startActivity(intent);
+                            // Check if the response is a numeric string
+                            if (response.matches("-?\\d+")) {
+                                // Assuming the server returns the ID of the newly inserted record
+                                election_id = Integer.parseInt(response.trim());
+                                Log.d("SaveTimes", "New record ID: " + election_id);
+                                Intent intent = new Intent(SupervisorActivity.this, VoterActivity.class);
+                                intent.putExtra("electionID", election_id);
+                                startActivity(intent);
+                            } else {
+                                // The response is not a numeric string
+                                Log.e("SaveTimes", "Unexpected server response: " + response);
+                                // You can show an error message to the user here
+                            }
                         } catch (NumberFormatException e) {
                             Log.e("SaveTimes", "Error parsing server response", e);
                         }

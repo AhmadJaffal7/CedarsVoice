@@ -3,6 +3,7 @@ package com.example.cedarsvoice;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ public class ResultsActivity extends AppCompatActivity {
     }
 
     private void fetchResults() {
-        String url = getString(R.string.server)+"get_results.php";
+        String url = getString(R.string.server) + "get_results.php";
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -53,27 +54,26 @@ public class ResultsActivity extends AppCompatActivity {
 
                         // Iterate through each candidate in the response
                         for (String candidate : candidates) {
-                            // Split each candidate's information (e.g., name and vote count)
+                            // Split each candidate's information (e.g., name last name and vote count)
                             String[] info = candidate.split(":");
                             if (info.length == 2) {
-                                String candidateName = info[0];
+                                String fullName = info[0];
                                 String encryptedVoteCount = info[1];
                                 int voteCount = decryptVoteCount(encryptedVoteCount);
-                                // Create a new row for the candidate in the table
-                                TableRow row = new TableRow(ResultsActivity.this);
-                                TextView name = new TextView(ResultsActivity.this);
-                                TextView voteCountTextView = new TextView(ResultsActivity.this);
+
+                                // Inflate the item_result layout
+                                View rowView = getLayoutInflater().inflate(R.layout.item_result, null);
+
+                                // Find the views in the inflated layout
+                                TextView nameTextView = rowView.findViewById(R.id.candidateName);
+                                TextView voteCountTextView = rowView.findViewById(R.id.voteCount);
 
                                 // Set text for name and vote count
-                                name.setText(candidateName);
+                                nameTextView.setText(fullName);
                                 voteCountTextView.setText(String.valueOf(voteCount));
 
-                                // Add name and vote count to the row
-                                row.addView(name);
-                                row.addView(voteCountTextView);
-
                                 // Add the row to the table
-                                resultsTable.addView(row);
+                                resultsTable.addView(rowView);
                             } else {
                                 Log.e("ResultsActivity", "Invalid candidate information: " + candidate);
                             }
@@ -90,7 +90,6 @@ public class ResultsActivity extends AppCompatActivity {
         // Add the request to the request queue
         requestQueue.add(stringRequest);
     }
-
     private int decryptVoteCount(String encryptedVoteCount) {
         try {
             // Decode the Base64 encoded data

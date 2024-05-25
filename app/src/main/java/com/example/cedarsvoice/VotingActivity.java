@@ -70,7 +70,7 @@ public class VotingActivity extends AppCompatActivity {
     }
 
     private void fetchCandidateNames() {
-        String url = getString(R.string.server)+"get_candidate_names.php";
+        String url = getString(R.string.server) + "get_candidate_names.php";
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -81,6 +81,10 @@ public class VotingActivity extends AppCompatActivity {
                             JSONArray jsonArray = new JSONArray(response);
                             List<String> candidateNames = new ArrayList<>();
                             candidateNameToIdMap = new HashMap<>();
+
+                            // Add a default sentence to be selected
+                            candidateNames.add("Select a candidate");
+
                             for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 String candidateName = jsonObject.getString("candidate_name");
@@ -435,19 +439,18 @@ public class VotingActivity extends AppCompatActivity {
 
             // Create a StringBuilder to build the remaining time string
             StringBuilder remainingTimeString = new StringBuilder();
-            remainingTimeString.append("Remaining time: ");
             // Append hours to the string if not zero
             if (hours > 0) {
-                remainingTimeString.append(hours).append(" hours ");
+                remainingTimeString.append(hours).append(":");
             }
 
             // Append minutes to the string if not zero
             if (minutes > 0) {
-                remainingTimeString.append(minutes).append(" minutes ");
+                remainingTimeString.append(minutes).append(":");
             }
 
             // Always append seconds
-            remainingTimeString.append(String.format(Locale.getDefault(), "%02d seconds", seconds));
+            remainingTimeString.append(String.format(Locale.getDefault(), "%02d", seconds));
 
             // Display remaining time in TextView
             remainingTimeTextView.setText(remainingTimeString.toString());

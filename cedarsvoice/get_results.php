@@ -7,8 +7,8 @@ try {
     $pdo = new PDO(DBCONNSTRING, DBUSER, DBPASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Query to fetch candidate information
-    $sql = "SELECT candidate_name, vote_count FROM candidates";
+    // Query to fetch candidate information including last name
+    $sql = "SELECT candidate_name, candidate_last_name, vote_count FROM candidates";
     $stmt = $pdo->query($sql);
 
     if ($stmt) {
@@ -17,8 +17,9 @@ try {
         // Fetch and append each candidate's information to the response string
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $candidateName = $row["candidate_name"];
+            $candidateLastName = $row["candidate_last_name"];
             $voteCount = $row["vote_count"];
-            $response .= $candidateName . ":" . $voteCount . ","; // Concatenate name and vote count with delimiter
+            $response .= $candidateName . " " . $candidateLastName . ":" . $voteCount . ","; // Concatenate name, last name, and vote count with delimiter
         }
 
         // Remove the trailing comma from the response

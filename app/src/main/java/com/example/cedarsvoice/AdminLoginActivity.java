@@ -58,6 +58,7 @@ public class AdminLoginActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "Login successful", Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(AdminLoginActivity.this, AdminActivity.class);
                                 startActivity(intent);
+                                finish();
                             } else {
                                 // Login failed
                                 Toast.makeText(getApplicationContext(), "Login failed. Incorrect name or password", Toast.LENGTH_SHORT).show();
