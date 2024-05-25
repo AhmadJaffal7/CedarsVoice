@@ -59,7 +59,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edit_text_bg"
             android:hint="Candidate Name"
-            android:inputType="text"
+            android:inputType="textPersonName"
             android:padding="12dp"
             android:textColor="#00803a" />
 
@@ -70,7 +70,7 @@
             android:layout_marginTop="8dp"
             android:background="@drawable/edit_text_bg"
             android:hint="Last Name"
-            android:inputType="text"
+            android:inputType="textPersonName"
             android:padding="12dp"
             android:textColor="#00803a" />
 

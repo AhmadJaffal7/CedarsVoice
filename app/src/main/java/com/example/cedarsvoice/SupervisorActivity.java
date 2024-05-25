@@ -1,12 +1,14 @@
 package com.example.cedarsvoice;
 
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -111,20 +113,25 @@ public class SupervisorActivity extends AppCompatActivity {
 
             // Parse start time
             Calendar startTimeCalendar = parseStartTime(startTimeString);
-            Log.e("SupervisorActivity", "Start time: " + startTimeCalendar.getTime());
             if (startTimeCalendar == null) {
                 Toast.makeText(this, "Error parsing start time. Please enter the date in the correct format.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // Parse start time
+            Calendar endTimeCalendar = parseStartTime(endTimeString);
+            if (endTimeCalendar == null) {
+                Toast.makeText(this, "Error parsing end time. Please enter the date in the correct format.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Parse end time
             SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-            Date endTime = null;
-            try {
-                endTime = dateFormat.parse(endTimeString);
-            } catch (ParseException e) {
-                Log.e("SupervisorActivity", "Error parsing end time", e);
-                Toast.makeText(this, "Error parsing end time. Please enter the date in the correct format.", Toast.LENGTH_SHORT).show();
+            Date endTime = dateFormat.parse(endTimeString);
+
+            // Check if the start time is before the end time
+            if (startTimeCalendar.getTimeInMillis() >= endTimeCalendar.getTimeInMillis()) {
+                Toast.makeText(this, "Start time must be before end time.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -135,20 +142,16 @@ public class SupervisorActivity extends AppCompatActivity {
                 // Start time is after the current time
                 showCountdownTimer(startTimeCalendar, endTime);
             } else {
-                // Check if the start time is before the end time
-                if (!startTimeCalendar.getTime().before(endTime)) {
-                    Toast.makeText(this, "Start time must be before end time.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                // Current time is after or equal to the start time
+                Toast.makeText(SupervisorActivity.this, "Start time must be after the current time.", Toast.LENGTH_SHORT).show();
             }
 
         } catch (Exception e) {
-            // Log the exception
             Log.e("SupervisorActivity", "Error during save times", e);
-            // Show an error message to the user
             Toast.makeText(this, "Error during save times. Please try again.", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void saveTimesToDatabase(final Date startTime, final Date endTime) {
         // Convert Date objects to the desired format for sending to the server
         SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
@@ -208,15 +211,16 @@ public class SupervisorActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    private void showCountdownTimer(Calendar startTimeCalendar, Date endTime) {
+    private void showCountdownTimer(final Calendar startTimeCalendar, final Date endTime) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Countdown Timer");
+        builder.setTitle("Election Starts In");
         builder.setCancelable(false); // User can't dismiss the dialog by clicking outside of it
 
-        final TextView countdownTextView = new TextView(this);
-        countdownTextView.setTextSize(24);
-        countdownTextView.setPadding(16, 16, 16, 16);
-        builder.setView(countdownTextView);
+        View dialogView = getLayoutInflater().inflate(R.layout.countdown_timer_dialog, null);
+        final TextView countdownTextView = dialogView.findViewById(R.id.countdownTextView);
+        final Button cancelButton = dialogView.findViewById(R.id.cancelButton);
+
+        builder.setView(dialogView);
 
         final AlertDialog dialog = builder.create();
 
@@ -252,12 +256,21 @@ public class SupervisorActivity extends AppCompatActivity {
                     saveTimesToDatabase(startTimeCalendar.getTime(), endTime);
                 }
             }.start();
+
+            // Set click listener for the cancel button
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dialog.dismiss();
+                }
+            });
         } else {
             // Current time is after or equal to the start time
             dialog.dismiss();
             Toast.makeText(SupervisorActivity.this, "Start time must be after the current time.", Toast.LENGTH_SHORT).show();
         }
     }
+
     private Calendar parseStartTime(String startTimeString) {
         Calendar startTimeCalendar = Calendar.getInstance();
         String[] timeParts = startTimeString.split(":");

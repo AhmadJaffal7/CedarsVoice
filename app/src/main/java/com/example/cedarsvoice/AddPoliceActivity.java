@@ -239,7 +239,7 @@ public class AddPoliceActivity extends AppCompatActivity {
         ProgressBar progressBar = findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
 
-        String checkIDUrl = "getString(R.string.server)+check_police_id.php?police_id=" + id;
+        String checkIDUrl = getString(R.string.server)+"check_police_id.php?police_id=" + id;
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, checkIDUrl,
