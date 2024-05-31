@@ -13,7 +13,7 @@ try {
     $stmt = $pdo->prepare($query);
     $stmt->bindValue(1, $start_time, PDO::PARAM_STR);
     $stmt->bindValue(2, $end_time, PDO::PARAM_STR);
-    $stmt->bindValue(3, $supervisor_id, PDO::PARAM_INT); // Assuming supervisor_id is an integer
+    $stmt->bindValue(3, $supervisor_id, PDO::PARAM_INT);
     $stmt->execute();
 
     // Get the ID of the newly inserted record

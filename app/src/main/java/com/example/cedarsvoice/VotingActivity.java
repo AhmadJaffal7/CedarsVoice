@@ -291,7 +291,7 @@ public class VotingActivity extends AppCompatActivity {
     public void logout() {
         // Create an intent to start VoterAct
         Intent intent = new Intent(VotingActivity.this, VoterActivity.class);
-        intent.putExtra("endTime", endTime);
+        intent.putExtra("electionID", electionId);
         startActivity(intent);
 
         // Finish the current activity

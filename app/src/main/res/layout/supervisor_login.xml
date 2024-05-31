@@ -13,8 +13,8 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:adjustViewBounds="true"
             android:layout_marginBottom="32dp"
+            android:adjustViewBounds="true"
             android:scaleType="fitCenter"
             android:src="@drawable/cedars" />
 
@@ -28,6 +28,19 @@
             android:inputType="number"
             android:textColor="@color/text_color" />
 
+        <Button
+            android:id="@+id/btnVerifySupervisor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="verifySupervisor"
+            android:text="Verify Supervisor"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
         <EditText
             android:id="@+id/editTextPoliceID"
             android:layout_width="match_parent"
@@ -37,6 +50,19 @@
             android:hint="Enter Police ID"
             android:inputType="number"
             android:textColor="@color/text_color" />
+
+        <Button
+            android:id="@+id/btnVerifyPolice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="-8dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/buttons_bg"
+            android:onClick="verifyPolice"
+            android:text="Verify Police"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/btnSupervisorLogin"

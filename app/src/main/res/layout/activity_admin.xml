@@ -19,143 +19,157 @@
             app:navigationIcon="@drawable/ic_back"
             app:title="Admin Page"
             app:titleCentered="true"
-            app:titleTextColor="@color/white"/>
+            app:titleTextColor="@color/white" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_color"
-        android:orientation="vertical"
-        android:padding="16dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <!-- Add Candidate -->
         <LinearLayout
-            android:id="@+id/llAddCandidate"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/buttons_bg"
-            android:gravity="center_vertical"
+            android:layout_height="match_parent"
+            android:background="@color/background_color"
+            android:orientation="vertical"
             android:padding="16dp">
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_candidate" />
-
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Add Candidate -->
+            <LinearLayout
+                android:id="@+id/llAddCandidate"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add Candidate"
-                android:textColor="@color/button_text_color"
-                android:textSize="16sp" />
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/buttons_bg"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_candidate" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Candidate"
+                    android:textColor="@color/button_text_color"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!-- Add Supervisor -->
+            <LinearLayout
+                android:id="@+id/llAddSupervisor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/buttons_bg"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_supervisor" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Supervisor"
+                    android:textColor="@color/button_text_color"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!-- Add Voter -->
+            <LinearLayout
+                android:id="@+id/llAddVoter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/buttons_bg"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_voter" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Voter"
+                    android:textColor="@color/button_text_color"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!-- Add Police -->
+            <LinearLayout
+                android:id="@+id/llAddPolice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/buttons_bg"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_police" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add Police"
+                    android:textColor="@color/button_text_color"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!-- Check Results -->
+            <LinearLayout
+                android:id="@+id/llCheckResults"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/buttons_bg"
+                android:gravity="center_vertical"
+                android:onClick="CheckResults"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_results" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Check Results"
+                    android:textColor="@color/button_text_color"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Add Supervisor -->
-        <LinearLayout
-            android:id="@+id/llAddSupervisor"
-            android:layout_width="match_parent"
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/buttons_bg"
-            android:gravity="center_vertical"
-            android:padding="16dp">
+            android:layout_centerInParent="true"
+            android:indeterminate="true"
+            android:visibility="gone" />
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_supervisor" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Supervisor"
-                android:textColor="@color/button_text_color"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <!-- Add Voter -->
-        <LinearLayout
-            android:id="@+id/llAddVoter"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/buttons_bg"
-            android:gravity="center_vertical"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_voter" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Voter"
-                android:textColor="@color/button_text_color"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <!-- Add Police -->
-        <LinearLayout
-            android:id="@+id/llAddPolice"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/buttons_bg"
-            android:gravity="center_vertical"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_police" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Add Police"
-                android:textColor="@color/button_text_color"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-        <!-- Check Results -->
-        <LinearLayout
-            android:id="@+id/llCheckResults"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/buttons_bg"
-            android:gravity="center_vertical"
-            android:onClick="CheckResults"
-            android:padding="16dp">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_results" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Check Results"
-                android:textColor="@color/button_text_color"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

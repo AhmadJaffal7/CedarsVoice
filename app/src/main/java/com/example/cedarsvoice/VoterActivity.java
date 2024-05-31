@@ -147,6 +147,7 @@ public class VoterActivity extends AppCompatActivity {
             Toast.makeText(VoterActivity.this, "Fingerprint doesn't match or ID is empty", Toast.LENGTH_SHORT).show();
         }
     }
+
     public void AuthenticateFingerprint(int nid) {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -190,11 +191,7 @@ public class VoterActivity extends AppCompatActivity {
             BiometricPrompt.CryptoObject cryptoObject = new BiometricPrompt.CryptoObject(cipher);
 
             // Build the BiometricPrompt.PromptInfo object
-            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                    .setTitle("Scan your fingerprint")
-                    .setNegativeButtonText("Cancel")
-                    .setConfirmationRequired(false)
-                    .build();
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder().setTitle("Scan your fingerprint").setNegativeButtonText("Cancel").setConfirmationRequired(false).build();
 
             // Create a BiometricPrompt object
             BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
@@ -226,6 +223,7 @@ public class VoterActivity extends AppCompatActivity {
                                         proceedWithLogin(String.valueOf(nid));
                                     }
                                 }
+
                                 @Override
                                 public void onError(String error) {
                                     runOnUiThread(new Runnable() {
@@ -254,6 +252,7 @@ public class VoterActivity extends AppCompatActivity {
                         Log.e("FingerprintCapture", "Error: ", e);
                     }
                 }
+
                 @Override
                 public void onAuthenticationError(int errorCode, CharSequence errString) {
                     super.onAuthenticationError(errorCode, errString);
@@ -582,34 +581,112 @@ public class VoterActivity extends AppCompatActivity {
         showDelayTimeDialog();
     }
     private void showDelayTimeDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Delay Time");
-
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_NUMBER);
-        input.setHint("Enter minutes to delay");
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String delayMinutesStr = input.getText().toString();
-                if (!delayMinutesStr.isEmpty()) {
-                    int delayMinutes = Integer.parseInt(delayMinutesStr);
-                    updateEndTime(delayMinutes);
-                } else {
-                    Toast.makeText(VoterActivity.this, "Delay minutes cannot be empty", Toast.LENGTH_SHORT).show();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                BiometricManager biometricManager = BiometricManager.from(this);
+                switch (biometricManager.canAuthenticate()) {
+                    case BiometricManager.BIOMETRIC_SUCCESS:
+                        Log.d(getString(R.string.app_name), "App can authenticate using biometrics.");
+                        break;
+                    case BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE:
+                        Log.e(getString(R.string.app_name), "No biometric features available on this device.");
+                        Toast.makeText(this, "No biometric features available on this device.", Toast.LENGTH_SHORT).show();
+                        return;
+                    case BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE:
+                        Log.e(getString(R.string.app_name), "Biometric features are currently unavailable.");
+                        Toast.makeText(this, "Biometric features are currently unavailable.", Toast.LENGTH_SHORT).show();
+                        return;
+                    case BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED:
+                        Log.e(getString(R.string.app_name), "The user hasn't associated any biometric credentials with their account.");
+                        Toast.makeText(this, "The user hasn't associated any biometric credentials with their account.", Toast.LENGTH_SHORT).show();
+                        return;
+                }
+            }else {
+                FingerprintManager fingerprintManager = (FingerprintManager) getSystemService(Context.FINGERPRINT_SERVICE);
+                if (!fingerprintManager.isHardwareDetected()) {
+                    // Device doesn't support fingerprint authentication
+                    Toast.makeText(this, "No biometric features available on this device.", Toast.LENGTH_SHORT).show();
+                    return;
+                } else if (!fingerprintManager.hasEnrolledFingerprints()) {
+                    // User hasn't enrolled any fingerprints to authenticate with
+                    Toast.makeText(this, "The user hasn't associated any biometric credentials with their account.", Toast.LENGTH_SHORT).show();
+                    return;
                 }
             }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
+            SecretKey secretKey = getStoredSecretKey();
+            // Create a Cipher object for encryption
+            Cipher cipher = Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" + KeyProperties.ENCRYPTION_PADDING_PKCS7);
 
-        builder.show();
+            // Initialize the Cipher for encryption
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+            // Build the BiometricPrompt.PromptInfo object
+            BiometricPrompt.PromptInfo promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                    .setTitle("Scan your fingerprint")
+                    .setNegativeButtonText("Cancel")
+                    .setConfirmationRequired(false)
+                    .build();
+
+            // Create a BiometricPrompt object
+            BiometricPrompt biometricPrompt = new BiometricPrompt(this, executor, new BiometricPrompt.AuthenticationCallback() {
+                @Override
+                public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                    super.onAuthenticationSucceeded(result);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(VoterActivity.this);
+                            builder.setTitle("Delay Time");
+
+                            final EditText input = new EditText(VoterActivity.this);
+                            input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                            input.setHint("Enter minutes to delay");
+                            builder.setView(input);
+
+                            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String delayMinutesStr = input.getText().toString();
+                                    if (!delayMinutesStr.isEmpty()) {
+                                        int delayMinutes = Integer.parseInt(delayMinutesStr);
+                                        updateEndTime(delayMinutes);
+                                    } else {
+                                        Toast.makeText(VoterActivity.this, "Delay minutes cannot be empty", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+
+                            builder.show();
+                        }
+                    });
+                }
+                @Override
+                public void onAuthenticationError(int errorCode, CharSequence errString) {
+                    super.onAuthenticationError(errorCode, errString);
+                    // Fingerprint authentication error, handle accordingly
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(VoterActivity.this, "Fingerprint authentication error: " + errString, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    Log.e("FingerprintAuth", "Error code: " + errorCode + ", error message: " + errString);
+                }
+            });
+
+            // Start the fingerprint authentication process
+            biometricPrompt.authenticate(promptInfo, new BiometricPrompt.CryptoObject(cipher));
+        } catch (Exception e) {
+            Toast.makeText(this, "Error initializing fingerprint capture: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e("FingerprintInit", "Error: ", e);
+        }
+
     }
 
     private void updateEndTime(int delayMinutes) {

@@ -118,7 +118,7 @@ public class SupervisorActivity extends AppCompatActivity {
                 return;
             }
 
-            // Parse start time
+            // Parse end time
             Calendar endTimeCalendar = parseStartTime(endTimeString);
             if (endTimeCalendar == null) {
                 Toast.makeText(this, "Error parsing end time. Please enter the date in the correct format.", Toast.LENGTH_SHORT).show();
